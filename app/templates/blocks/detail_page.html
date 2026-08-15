@@ -1,0 +1,83 @@
+{% extends "layouts/app.html" %}
+{% from "components/page_header.html" import page_header %}
+
+{% block title %}{{ customer.name }} – Flask Starter{% endblock %}
+{% block breadcrumb %}
+  <a href="{{ url_for('dashboard.customers') }}" class="hover:underline text-muted-foreground">Customers</a>
+  <span class="mx-2 text-muted-foreground">/</span>
+  {{ customer.name }}
+{% endblock %}
+
+{% block content %}
+
+{{ page_header(
+  title=customer.name,
+  description=customer.email,
+  action='<a href="' ~ url_for("dashboard.customer_edit", customer_id=customer.id) ~ '" class="btn" data-variant="outline">Edit customer</a>'
+) }}
+
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
+  {# Overview card #}
+  <div class="card md:col-span-2">
+    <header><h2>Overview</h2></header>
+    <section>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Plan</dt>
+          <dd class="mt-1 font-medium">{{ customer.plan }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Status</dt>
+          <dd class="mt-1">
+            <span class="badge" data-variant="{{ 'secondary' if customer.status == 'Inactive' else 'outline' }}">{{ customer.status }}</span>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Revenue</dt>
+          <dd class="mt-1 font-medium">{{ customer.revenue }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Joined</dt>
+          <dd class="mt-1 text-muted-foreground">{{ customer.joined }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Email</dt>
+          <dd class="mt-1 text-muted-foreground">{{ customer.email }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">ID</dt>
+          <dd class="mt-1 font-mono text-muted-foreground">#{{ customer.id }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  {# Quick actions card #}
+  <div class="card">
+    <header><h2>Quick Actions</h2></header>
+    <section class="flex flex-col gap-2">
+      <button type="button" class="btn w-full" data-variant="outline">Send invoice</button>
+      <button type="button" class="btn w-full" data-variant="outline">Send email</button>
+      <button type="button" class="btn w-full" data-variant="outline">Export data</button>
+      <hr class="my-1"/>
+      <button type="button" class="btn w-full" data-variant="destructive">Delete customer</button>
+    </section>
+  </div>
+
+  {# Activity placeholder #}
+  <div class="card md:col-span-3">
+    <header><h2>Activity</h2><p>Interaction history for this customer.</p></header>
+    <section>
+      <div class="empty">
+        <div class="empty-icon">
+          <svg class="lucide lucide-clock" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <p class="empty-title">No activity yet</p>
+        <p class="empty-description">Activity will appear here once interactions are recorded.</p>
+      </div>
+    </section>
+  </div>
+
+</div>
+{% endblock %}

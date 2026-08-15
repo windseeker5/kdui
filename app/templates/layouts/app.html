@@ -1,0 +1,99 @@
+{% extends "layouts/base.html" %}
+{% from "basecoat/sidebar.html.jinja" import sidebar %}
+
+{% block body %}
+{# Sidebar #}
+{% set nav_items = [
+  { "type": "group", "label": "Main", "items": [
+    { "type": "item", "label": "Dashboard",  "url": url_for("dashboard.index"),   "icon": '<svg class="lucide lucide-layout-dashboard" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>', "current": (request.endpoint == "dashboard.index") },
+    { "type": "item", "label": "Customers",  "url": url_for("dashboard.customers"), "icon": '<svg class="lucide lucide-users" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', "current": ("dashboard.customers" in request.endpoint) },
+    { "type": "item", "label": "Settings",   "url": url_for("dashboard.settings"),  "icon": '<svg class="lucide lucide-settings" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>', "current": (request.endpoint == "dashboard.settings") }
+  ]},
+  { "type": "group", "label": "Projects", "items": [
+    { "type": "item", "label": "Projects", "url": url_for("project.list_project"), "icon": '<svg class="lucide lucide-folder-kanban" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>', "current": ("project" in request.endpoint) }
+  ]},
+  { "type": "separator" },
+  { "type": "group", "label": "Tools", "items": [
+    { "type": "item", "label": "UI Gallery", "url": url_for("gallery.index"), "icon": '<svg class="lucide lucide-layout-template" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg>' }
+  ]}
+] %}
+
+{# Sidebar header: logo + app name, plus a mobile-only close button so the
+   open drawer has an explicit, visible way to dismiss it (not just tapping
+   the scrim). Hidden on desktop since the sidebar is pinned open there. #}
+{% set sidebar_header %}
+<div class="flex items-center justify-between gap-2 px-2 py-1">
+  <div class="flex items-center gap-2 min-w-0">
+    <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">K</div>
+    <span class="font-semibold text-sm truncate">Flask Starter</span>
+  </div>
+  <button
+    type="button"
+    class="btn md:hidden" data-variant="ghost" data-size="icon-sm"
+    aria-label="Close sidebar"
+    onclick="document.querySelector('.sidebar')?.close()"
+  >
+    <svg class="lucide lucide-x size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+  </button>
+</div>
+{% endset %}
+
+{# Sidebar footer: theme toggle #}
+{% set sidebar_footer %}
+<div class="flex items-center justify-between px-2">
+  <span class="text-xs text-muted-foreground">v0.1.0</span>
+  <button
+    type="button"
+    aria-label="Toggle dark mode"
+    data-tooltip="Toggle dark mode"
+    data-side="top"
+    onclick="window.basecoat.theme.toggle()"
+    class="btn" data-variant="ghost" data-size="icon-sm"
+  >
+    <span class="hidden dark:block">
+      <svg class="lucide lucide-sun size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    </span>
+    <span class="block dark:hidden">
+      <svg class="lucide lucide-moon size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+    </span>
+  </button>
+</div>
+{% endset %}
+
+{{ sidebar(menu=nav_items, header=sidebar_header, footer=sidebar_footer) }}
+
+{# Main content area #}
+<main>
+  {# Top header bar: mobile-only. Desktop has the sidebar always visible and
+     each page's own page_header title, so this bar would just be an empty
+     redundant strip on desktop — hide it there entirely.
+     IMPORTANT: uses md:hidden (768px), not lg:hidden (1024px). Basecoat's
+     sidebar JS switches from mobile-overlay to pinned-desktop mode at 768px
+     (its own hardcoded default breakpoint — see basecoat.all.min.js). If
+     this bar used a different breakpoint than the sidebar, there's a dead
+     zone (768px–1024px here) where the sidebar is already pinned open but
+     this "mobile" bar is still showing too, which makes the layout look
+     broken/non-fluid when resizing. Keep these in sync.
+     No breadcrumb text here on purpose — the page's own page_header title
+     right below it would make it a redundant duplicate title on mobile. #}
+  <header class="md:hidden flex h-14 items-center gap-3 border-b px-4">
+    <button
+      type="button"
+      class="btn" data-variant="ghost" data-size="icon"
+      aria-label="Open sidebar"
+      onclick="document.querySelector('.sidebar')?.toggle()"
+    >
+      <svg class="lucide lucide-menu size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+    </button>
+  </header>
+
+  {# Page content. max-w-7xl keeps tables/forms readable on ultrawide
+     monitors instead of stretching edge-to-edge; mx-auto centers it once
+     the viewport exceeds that width. #}
+  <div class="p-4 md:p-6">
+    <div class="mx-auto w-full max-w-7xl">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</main>
+{% endblock %}

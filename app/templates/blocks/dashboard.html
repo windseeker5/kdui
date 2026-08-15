@@ -1,0 +1,90 @@
+{% extends "layouts/app.html" %}
+{% from "components/stat_card.html" import stat_card %}
+{% from "components/page_header.html" import page_header %}
+
+{% block title %}Dashboard – Flask Starter{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+
+{{ page_header(title="Dashboard", description="Welcome back. Here's what's happening.") }}
+
+{# ── KPI Stat Grid ── #}
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+  {% for stat in stats %}
+    {{ stat_card(label=stat.label, value=stat.value, delta=stat.delta, trend=stat.trend) }}
+  {% endfor %}
+</div>
+
+{# ── Bottom two columns ── #}
+<div class="grid gap-4 lg:grid-cols-3">
+
+  {# Recent Customers table #}
+  <div class="lg:col-span-2">
+    <div class="card">
+      <header>
+        <h2>Recent Customers</h2>
+        <p>Latest accounts added to your workspace.</p>
+        <div class="card-action">
+          <a href="{{ url_for('dashboard.customers') }}" class="btn" data-variant="outline" data-size="sm">View all</a>
+        </div>
+      </header>
+      <section class="p-0">
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Plan</th>
+                <th>Revenue</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in recent_customers %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('dashboard.customer_detail', customer_id=c.id) }}" class="font-medium hover:underline">{{ c.name }}</a>
+                  <p class="text-xs text-muted-foreground">{{ c.email }}</p>
+                </td>
+                <td>{{ c.plan }}</td>
+                <td>{{ c.revenue }}</td>
+                <td>
+                  <span class="badge" data-variant="{{ 'secondary' if c.status == 'Inactive' else 'outline' }}">{{ c.status }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  {# Recent Activity feed #}
+  <div>
+    <div class="card h-full">
+      <header>
+        <h2>Recent Activity</h2>
+        <p>Latest events in your workspace.</p>
+      </header>
+      <section>
+        <ul class="space-y-4">
+          {% for event in recent_activity %}
+          <li class="flex items-start gap-3">
+            <div class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
+              <svg class="size-3.5 text-muted-foreground lucide lucide-activity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm leading-tight">{{ event.text }}</p>
+              <p class="text-xs text-muted-foreground mt-0.5">{{ event.time }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

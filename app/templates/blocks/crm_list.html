@@ -1,0 +1,69 @@
+{% extends "layouts/app.html" %}
+{% from "components/page_header.html"  import page_header %}
+{% from "components/search_filter.html" import search_filter %}
+{% from "components/data_table.html"   import data_table %}
+{% from "components/pagination.html"   import pagination %}
+{% from "components/action_menu.html"  import action_menu %}
+
+{% block title %}Customers – Flask Starter{% endblock %}
+{% block breadcrumb %}Customers{% endblock %}
+
+{% block content %}
+
+{{ page_header(
+  title="Customers",
+  description="Manage your customer accounts.",
+  action='<a href="' ~ url_for("dashboard.customer_new") ~ '" class="btn"><svg data-icon="inline-start" class="lucide lucide-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add customer</a>'
+) }}
+
+{{ search_filter(
+  action=url_for("dashboard.customers"),
+  q=q,
+  filters=[
+    {"name": "status", "label": "Status",
+     "options": [("", "All statuses"), ("active", "Active"), ("inactive", "Inactive")],
+     "value": status}
+  ]
+) }}
+
+<p class="text-sm text-muted-foreground mb-3">{{ total }} customer{{ "s" if total != 1 else "" }}</p>
+
+{#
+  UX rules applied here:
+  1. Date column first, sorted DESC (newest customers at top by default).
+  2. Right-aligned numeric/currency column headers via align="end".
+  3. Row actions consolidated into a single action_menu component.
+#}
+{% set columns = [
+  {"key": "joined",  "label": "Joined",  "sortable": true},
+  {"key": "name",    "label": "Name",    "sortable": true},
+  {"key": "plan",    "label": "Plan",    "sortable": true},
+  {"key": "revenue", "label": "Revenue", "sortable": false, "align": "end"},
+  {"key": "status",  "label": "Status",  "sortable": true},
+  {"key": "_actions","label": "",        "sortable": false, "align": "end"}
+] %}
+
+{% call(row) data_table(columns=columns, rows=customers, sort=sort, order=order, base_url=url_for("dashboard.customers"), scrollable=false) %}
+  <td class="text-muted-foreground text-sm">{{ row.joined }}</td>
+  <td>
+    <a href="{{ url_for('dashboard.customer_detail', customer_id=row.id) }}" class="font-medium hover:underline">{{ row.name }}</a>
+    <p class="text-xs text-muted-foreground">{{ row.email }}</p>
+  </td>
+  <td>{{ row.plan }}</td>
+  <td class="text-end">{{ row.revenue }}</td>
+  <td>
+    <span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span>
+  </td>
+  <td class="text-end">
+    {{ action_menu(id="customer-" ~ row.id, items=[
+      {"label": "View", "url": url_for('dashboard.customer_detail', customer_id=row.id)},
+      {"label": "Edit", "url": url_for('dashboard.customer_edit', customer_id=row.id)},
+      {"type": "separator"},
+      {"label": "Delete", "attrs": {"class": "text-destructive"}}
+    ]) }}
+  </td>
+{% endcall %}
+
+{{ pagination(page=page, total_pages=total_pages, base_url=url_for("dashboard.customers"), extra_params={"q": q, "status": status, "sort": sort, "order": order}) }}
+
+{% endblock %}

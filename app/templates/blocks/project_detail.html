@@ -1,0 +1,51 @@
+{% extends "layouts/app.html" %}
+{% from "components/page_header.html" import page_header %}
+
+{% block title %}{{ item.name }} - App{% endblock %}
+{% block breadcrumb %}
+  <a href="{{ url_for('project.list_project') }}" class="hover:underline text-muted-foreground">Projects</a>
+  <span class="mx-2 text-muted-foreground">/</span>
+  {{ item.name }}
+{% endblock %}
+
+{% block content %}
+
+{{ page_header(
+  title=item.name|string,
+  action='<a href="' ~ url_for("project.edit_project", item_id=item.id) ~ '" class="btn" data-variant="outline">Edit</a>'
+) }}
+
+<div class="grid gap-4 md:grid-cols-3">
+  <div class="card md:col-span-2">
+    <header><h2>Details</h2></header>
+    <section>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Name</dt>
+          <dd class="mt-1 font-medium">{{ item.name }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Owner</dt>
+          <dd class="mt-1 font-medium">{{ item.owner }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Status</dt>
+          <dd class="mt-1 font-medium"><span class="badge" data-variant="{{ 'secondary' if item.status == 'Inactive' else 'outline' }}">{{ item.status }}</span></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted-foreground uppercase tracking-wide">Due</dt>
+          <dd class="mt-1 font-medium">{{ item.due }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+  <div class="card">
+    <header><h2>Actions</h2></header>
+    <section class="flex flex-col gap-2">
+      <a href="{{ url_for('project.edit_project', item_id=item.id) }}" class="btn w-full" data-variant="outline">Edit</a>
+      <button type="button" class="btn w-full" data-variant="destructive">Delete</button>
+    </section>
+  </div>
+</div>
+
+{% endblock %}

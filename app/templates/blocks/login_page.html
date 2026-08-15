@@ -1,0 +1,50 @@
+{% extends "layouts/public.html" %}
+
+{% block title %}Login – Flask Starter{% endblock %}
+
+{% block public_body %}
+<div class="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4">
+  <div class="w-full max-w-sm">
+
+    {# Logo / brand #}
+    <div class="mb-8 flex flex-col items-center gap-2 text-center">
+      <div class="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-lg">K</div>
+      <h1 class="text-xl font-semibold">Flask Starter</h1>
+      <p class="text-sm text-muted-foreground">Sign in to your account</p>
+    </div>
+
+    <div class="card">
+      <section>
+        <form method="post" action="{{ url_for('public.login') }}" class="grid gap-4">
+          <div class="grid gap-2">
+            <label class="label" for="email">Email</label>
+            <input class="input" type="email" id="email" name="email"
+                   placeholder="you@company.com" autocomplete="email" required />
+          </div>
+          <div class="grid gap-2">
+            <div class="flex items-center justify-between">
+              <label class="label" for="password">Password</label>
+              <a href="#" class="text-xs text-muted-foreground hover:underline underline-offset-4">Forgot password?</a>
+            </div>
+            <input class="input" type="password" id="password" name="password"
+                   autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="btn w-full">Sign in</button>
+        </form>
+      </section>
+      <footer class="justify-center">
+        <p class="text-sm text-muted-foreground">
+          No account?
+          <a href="#" class="underline underline-offset-4 hover:text-foreground">Sign up</a>
+        </p>
+      </footer>
+    </div>
+
+    <p class="mt-6 text-center text-xs text-muted-foreground">
+      By signing in you agree to our
+      <a href="#" class="underline underline-offset-4 hover:text-foreground">Terms of Service</a>.
+    </p>
+
+  </div>
+</div>
+{% endblock %}

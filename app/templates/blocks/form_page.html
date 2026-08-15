@@ -1,0 +1,71 @@
+{% extends "layouts/app.html" %}
+{% from "components/page_header.html" import page_header %}
+
+{% set is_edit = customer is not none %}
+{% block title %}{{ "Edit" if is_edit else "New" }} Customer – Flask Starter{% endblock %}
+{% block breadcrumb %}
+  <a href="{{ url_for('dashboard.customers') }}" class="hover:underline text-muted-foreground">Customers</a>
+  <span class="mx-2 text-muted-foreground">/</span>
+  {{ "Edit " ~ customer.name if is_edit else "New customer" }}
+{% endblock %}
+
+{% block content %}
+
+{{ page_header(
+  title=("Edit " ~ customer.name) if is_edit else "New Customer",
+  description="Fill in the details below."
+) }}
+
+<div class="max-w-2xl">
+  <div class="card">
+    <header>
+      <h2>Customer Details</h2>
+      <p>All fields marked * are required.</p>
+    </header>
+    <section>
+      <form method="post" class="grid gap-5">
+        <div class="grid gap-2">
+          <label class="label" for="name">Company name *</label>
+          <input class="input" type="text" id="name" name="name"
+                 value="{{ customer.name if is_edit else '' }}" required placeholder="Acme Corp" />
+        </div>
+
+        <div class="grid gap-2">
+          <label class="label" for="email">Email address *</label>
+          <input class="input" type="email" id="email" name="email"
+                 value="{{ customer.email if is_edit else '' }}" required placeholder="hello@company.com" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="grid gap-2">
+            <label class="label" for="plan">Plan *</label>
+            <select class="input" id="plan" name="plan">
+              {% for p in ["Starter", "Pro", "Enterprise"] %}
+              <option value="{{ p }}" {{ "selected" if is_edit and customer.plan == p else "" }}>{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="grid gap-2">
+            <label class="label" for="status">Status *</label>
+            <select class="input" id="status" name="status">
+              <option value="Active"   {{ "selected" if is_edit and customer.status == "Active"   else "" }}>Active</option>
+              <option value="Inactive" {{ "selected" if is_edit and customer.status == "Inactive" else "" }}>Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid gap-2">
+          <label class="label" for="notes">Notes</label>
+          <textarea class="input min-h-24" id="notes" name="notes" placeholder="Optional notes about this customer…"></textarea>
+        </div>
+      </form>
+    </section>
+    <footer class="justify-end gap-2">
+      <a href="{{ url_for('dashboard.customers') }}" class="btn" data-variant="ghost">Cancel</a>
+      <button type="submit" form="customer-form" class="btn">
+        {{ "Save changes" if is_edit else "Create customer" }}
+      </button>
+    </footer>
+  </div>
+</div>
+{% endblock %}

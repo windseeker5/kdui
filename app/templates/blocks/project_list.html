@@ -1,0 +1,62 @@
+{% extends "layouts/app.html" %}
+{% from "components/page_header.html"   import page_header %}
+{% from "components/search_filter.html" import search_filter %}
+{% from "components/data_table.html"    import data_table %}
+{% from "components/pagination.html"    import pagination %}
+
+{% block title %}Projects - App{% endblock %}
+{% block breadcrumb %}Projects{% endblock %}
+
+{% block content %}
+
+{{ page_header(
+  title="Projects",
+  description="Manage your project records.",
+  action='<a href="' ~ url_for("project.new_project") ~ '" class="btn">
+<svg data-icon="inline-start" class="lucide lucide-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+Add project</a>'
+) }}
+
+{{ search_filter(
+  action=url_for("project.list_project"),
+  q=q,
+  filters=[
+    {
+      "name": "status",
+      "options": [("", "All"), ("active", "Active"), ("inactive", "Inactive")],
+      "value": status
+    }
+  ]
+) }}
+
+<p class="text-sm text-muted-foreground mb-3">{{ total }} record{{ "s" if total != 1 else "" }}</p>
+
+{% set columns = [
+  {"key": "name", "label": "Name", "sortable": true},
+  {"key": "owner", "label": "Owner", "sortable": true},
+  {"key": "status", "label": "Status", "sortable": false},
+  {"key": "due", "label": "Due", "sortable": true},
+  {"key": "_actions", "label": "", "sortable": false}
+] %}
+
+{% call(row) data_table(columns=columns, rows=project_list, sort=sort, order=order, base_url=url_for("project.list_project")) %}
+  <td>{{ row.name }}</td>
+  <td>{{ row.owner }}</td>
+  <td><span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span></td>
+  <td>{{ row.due }}</td>
+  <td class="text-end">
+    <div class="inline-flex gap-1">
+      <a href="{{ url_for('project.detail_project', item_id=row.id) }}" class="btn" data-variant="ghost" data-size="sm">View</a>
+      <a href="{{ url_for('project.edit_project',   item_id=row.id) }}" class="btn" data-variant="ghost" data-size="sm">Edit</a>
+    </div>
+  </td>
+{% endcall %}
+
+{{ pagination(
+  page=page,
+  total_pages=total_pages,
+  base_url=url_for("project.list_project"),
+  extra_params={"q": q, "sort": sort, "order": order, "status": status}
+) }}
+
+{% endblock %}
