@@ -5,6 +5,9 @@
 {% from "components/empty_state.html" import empty_state %}
 {% from "components/metric_pill.html" import metric_pill %}
 {% from "components/action_menu.html" import action_menu %}
+{% from "components/data_table.html" import data_table %}
+{% from "components/file_upload.html" import file_upload %}
+{% from "components/timeline.html" import timeline %}
 
 {% block title %}Components – UI Gallery{% endblock %}
 {% block breadcrumb %}
@@ -85,6 +88,44 @@
   </div>
 {% endcall %}
 
+{# ── File Upload ── #}
+{% call section("File Upload", "Tap-friendly file picker with drag/drop and optional image preview. JavaScript behavior is progressive enhancement.", '
+{% from "components/file_upload.html" import file_upload %}
+
+<form method="post" enctype="multipart/form-data">
+  <div id="avatar-preview-container" class="hidden">
+    <img id="avatar-preview" alt="Selected image preview" />
+  </div>
+  {{ file_upload(
+    input_id="avatar",
+    name="avatar",
+    prompt="Add a photo",
+    hint="JPEG or PNG. 5 MB maximum.",
+    accept="image/jpeg,image/png",
+    preview_id="avatar-preview",
+    preview_container_id="avatar-preview-container"
+  ) }}
+  <button type="submit" class="btn">Upload</button>
+</form>
+') %}
+  <form class="grid w-full max-w-xl gap-3" onsubmit="return false">
+    <div id="gallery-upload-preview-container" class="hidden overflow-hidden rounded-lg border bg-background">
+      <img id="gallery-upload-preview" alt="Selected image preview" class="max-h-64 w-full object-contain" />
+    </div>
+    {{ file_upload(
+      input_id="gallery-upload",
+      name="gallery_upload",
+      prompt="Add a photo",
+      hint="Choose an image or drag and drop it here.",
+      accept="image/*",
+      preview_id="gallery-upload-preview",
+      preview_container_id="gallery-upload-preview-container",
+      class_="bg-background"
+    ) }}
+    <button type="submit" class="btn justify-self-start">Upload</button>
+  </form>
+{% endcall %}
+
 {# ── Card ── #}
 {% call section("Card", "Container with optional header, body, and footer sections.", '
 {% from "components/card.html" import card %}
@@ -119,68 +160,57 @@
   {{ alert(title="Error", message="Something went wrong. Please try again.", variant="destructive") }}
 {% endcall %}
 
-{# ── Table ── #}
-{#
-  Note: in real pages use components/data_table.html which renders this
-  bordered container automatically. The raw markup is shown here only to
-  demonstrate the visual standard every table should follow.
-  UX rule: Date column is always first, sorted descending.
-#}
-{% call section("Table", "Semantic HTML table with Basecoat styling. Use the data_table component macro in real pages. UX rule: Date first, sorted descending. Use align='end' in column dicts for right-aligned headers.", '
-{% from "components/action_menu.html" import action_menu %}
-<div class="rounded-lg border bg-background overflow-x-visible w-full">
-  <table class="table">
-    <thead><tr><th>Date</th><th>Company</th><th>Plan</th><th>Status</th><th class="text-end">Revenue</th><th class="text-end"></th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="text-muted-foreground">2026-08-14</td>
-        <td class="font-medium">Acme Corp</td>
-        <td>Pro</td>
-        <td><span class="badge" data-variant="outline">Active</span></td>
-        <td class="text-end">$12,400</td>
-        <td class="text-end">{{ action_menu(id="demo-1", items=[{"label":"View"},{"label":"Edit"},{"type":"separator"},{"label":"Delete","attrs":{"class":"text-destructive"}}]) }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+{# ── Data Table ── #}
+{% call section("Data Table", "Sortable table macro with empty state, alignment controls, and optional action menus.", '
+{% from "components/data_table.html" import data_table %}
+
+{% set columns = [
+  {"key": "name", "label": "Company", "sortable": true},
+  {"key": "revenue", "label": "Revenue", "sortable": true, "align": "end"}
+] %}
+{% call(row) data_table(columns=columns, rows=companies, sort="name", order="asc", base_url="/companies") %}
+  <td class="font-medium">{{ row.name }}</td>
+  <td class="text-end">{{ row.revenue }}</td>
+{% endcall %}
 ') %}
-  <div class="rounded-lg border bg-background overflow-x-visible w-full">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Company</th>
-          <th>Plan</th>
-          <th>Status</th>
-          <th class="text-end">Revenue</th>
-          <th class="text-end"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in [
-          {"id": 1, "date": "2026-08-14", "name":"Acme Corp",        "plan":"Pro",        "status":"Active",   "revenue":"$12,400"},
-          {"id": 2, "date": "2026-08-10", "name":"Stark Industries", "plan":"Enterprise", "status":"Active",   "revenue":"$92,000"},
-          {"id": 3, "date": "2026-07-28", "name":"Initech",          "plan":"Pro",        "status":"Inactive", "revenue":"$8,750"}
-        ] %}
-        <tr>
-          <td class="text-muted-foreground">{{ row.date }}</td>
-          <td class="font-medium">{{ row.name }}</td>
-          <td>{{ row.plan }}</td>
-          <td><span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span></td>
-          <td class="text-end">{{ row.revenue }}</td>
-          <td class="text-end">
-            {{ action_menu(id="tbl-" ~ row.id, items=[
-              {"label": "View"},
-              {"label": "Edit"},
-              {"type": "separator"},
-              {"label": "Delete", "attrs": {"class": "text-destructive"}}
-            ]) }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  {% set demo_columns = [
+    {"key": "name", "label": "Company", "sortable": true},
+    {"key": "status", "label": "Status", "sortable": false},
+    {"key": "revenue", "label": "Revenue", "sortable": true, "align": "end"}
+  ] %}
+  {% set demo_rows = [
+    {"id": 1, "name": "Acme Corp", "status": "Active", "revenue": 12400},
+    {"id": 2, "name": "Stark Industries", "status": "Active", "revenue": 92000},
+    {"id": 3, "name": "Initech", "status": "Inactive", "revenue": 8750}
+  ] %}
+  {% set demo_sort = request.args.get("sort", "name") if request.args.get("sort", "name") in ("name", "revenue") else "name" %}
+  {% set demo_order = "desc" if request.args.get("order") == "desc" else "asc" %}
+  {% set demo_rows = demo_rows | sort(attribute=demo_sort, reverse=(demo_order == "desc")) %}
+  <div class="w-full">
+    {% call(row) data_table(columns=demo_columns, rows=demo_rows, sort=demo_sort, order=demo_order, base_url=url_for("gallery.components")) %}
+      <td class="font-medium">{{ row.name }}</td>
+      <td><span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span></td>
+      <td class="text-end">{{ "${:,.0f}".format(row.revenue) }}</td>
+    {% endcall %}
   </div>
+{% endcall %}
+
+{# ── Action Menu ── #}
+{% call section("Action Menu", "Compact row or card actions powered by Basecoat's dropdown menu.", '
+{% from "components/action_menu.html" import action_menu %}
+{{ action_menu(id="record-actions", items=[
+  {"label": "View", "url": "/records/1"},
+  {"label": "Edit", "url": "/records/1/edit"},
+  {"type": "separator"},
+  {"label": "Delete", "attrs": {"class": "text-destructive"}}
+]) }}
+') %}
+  {{ action_menu(id="gallery-actions", items=[
+    {"label": "View"},
+    {"label": "Edit"},
+    {"type": "separator"},
+    {"label": "Delete", "attrs": {"class": "text-destructive"}}
+  ]) }}
 {% endcall %}
 
 {# ── Empty State ── #}
@@ -197,6 +227,23 @@
     description="Try adjusting your search or filter to find what you're looking for.",
     action='<button type="button" class="btn" data-variant="outline">Clear filters</button>'
   ) }}
+{% endcall %}
+
+{# ── Timeline ── #}
+{% call section("Timeline", "Vertical chronological list for activity, audit history, and project milestones.", '
+{% from "components/timeline.html" import timeline %}
+{{ timeline(items=[
+  {"date": "Aug 14, 2026", "title": "Release deployed", "description": "Version 2.4 is live.", "badge": "Release"},
+  {"date": "Aug 12, 2026", "title": "Review approved", "badge": "Review", "badge_variant": "secondary"}
+]) }}
+') %}
+  <div class="w-full max-w-md">
+    {{ timeline(items=[
+      {"date": "Aug 14, 2026", "title": "Release deployed", "description": "Version 2.4 is live for all customers.", "badge": "Release"},
+      {"date": "Aug 12, 2026", "title": "Review approved", "description": "Accessibility and performance checks passed.", "badge": "Review", "badge_variant": "secondary"},
+      {"date": "Aug 8, 2026", "title": "Prototype created", "badge": "Draft", "badge_variant": "outline"}
+    ]) }}
+  </div>
 {% endcall %}
 
 {# ── Metric Pill ── #}

@@ -13,7 +13,13 @@
     {% endcall %}
 
   Params:
-    columns    {list of dicts}  Each dict: { key, label, sortable (bool, default false) }
+    columns    {list of dicts}  Each dict: { key, label, sortable (bool, default false),
+                                align (optional: "start" | "end", default "start") }.
+                                Set align="end" on any column whose <td> cells are
+                                right-aligned (e.g. currency, or an actions column)
+                                so the header lines up with the data instead of
+                                staying left-aligned while the column reads right —
+                                that mismatch is what makes a table look "wrong".
     rows       {list}           Row data; caller renders the <td> cells.
     sort       {string}         Current sort column key.
     order      {string}         "asc" | "desc".
@@ -24,7 +30,8 @@
                                 tables on narrow screens. Set to false if any
                                 row uses a Basecoat popover-based component
                                 (dropdown-menu, select, combobox, popover) —
-                                see the "Popover clipping" note below.
+                                 see the "Popover clipping" note below.
+    class_     {string}         Additional classes for the table wrapper.
 
   Popover clipping gotcha:
     Basecoat hides a *closed* popover with opacity:0 + scale (for the
@@ -36,20 +43,35 @@
     so a dropdown-menu/select/combobox/popover placed in any column of a
     scrollable table gets silently clipped the instant it opens, even
     though nothing is actually scrolled. If a row action needs one of
-    those components, pass `scrollable=false` (only safe if the table's
-    columns don't actually need horizontal scroll on narrow screens).
+    those components (e.g. components/action_menu.html), pass
+    scrollable=false (only safe if the table's columns don't actually
+    need horizontal scroll on narrow screens).
 #}
-{% macro data_table(columns, rows, sort=None, order="asc", base_url="", caption=None, scrollable=true) %}
-<div class="{{ 'table-container' if scrollable else 'overflow-x-visible' }}">
+{% macro data_table(columns, rows, sort=None, order="asc", base_url="", caption=None, scrollable=true, class_="") %}
+{#
+  rounded-lg border + bg-background makes the standard component render as
+  a bordered card rather than a bare table.
+
+  IMPORTANT: no overflow-hidden here, even though it would look slightly
+  cleaner clipping the table's square corners to the container's rounded
+  ones. scrollable=false tables use overflow-x-visible specifically so a
+  row's action_menu popover (dropdown-menu) isn't clipped when it opens —
+  see the "Popover clipping" note above. overflow-hidden would silently
+  reintroduce that exact bug for every scrollable=false table. The square
+  corners peeking past the rounded border by ~1px is the acceptable
+  tradeoff; a clipped, invisible dropdown menu is not.
+#}
+<div class="rounded-lg border bg-background {{ 'table-container' if scrollable else 'overflow-x-visible' }} {{ class_ }}">
   <table class="table">
     {% if caption %}<caption>{{ caption }}</caption>{% endif %}
     <thead>
       <tr>
         {% for col in columns %}
-        <th>
+        {% set align = col.get("align", "start") %}
+        <th class="{{ 'text-end' if align == 'end' else '' }}">
           {% if col.get("sortable") %}
             {% set next_order = "desc" if (sort == col.key and order == "asc") else "asc" %}
-            <a href="{{ base_url }}?sort={{ col.key }}&order={{ next_order }}" class="inline-flex items-center gap-1 hover:text-foreground text-muted-foreground font-medium">
+            <a href="{{ base_url }}?sort={{ col.key }}&order={{ next_order }}" class="inline-flex items-center gap-1 hover:text-foreground text-muted-foreground font-medium {{ 'justify-end w-full' if align == 'end' else '' }}">
               {{ col.label }}
               {% if sort == col.key %}
                 {% if order == "asc" %}

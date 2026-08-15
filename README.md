@@ -72,10 +72,27 @@ No React. No TypeScript. No SPA framework. Server-side rendered, always.
 ### Components included
 
 `stat_card` · `page_header` · `card` · `data_table` · `pagination` · `search_filter` ·
-`alert` · `empty_state` · Basecoat sidebar · Basecoat tabs · Basecoat dialog ·
-Basecoat select · Basecoat toast · dark mode toggle
+`alert` · `empty_state` · `action_menu` · `metric_pill` · `timeline` · `file_upload` ·
+Basecoat sidebar · Basecoat tabs · Basecoat dialog · Basecoat select · Basecoat toast ·
+dark mode toggle
 
 See them all live at **`/ui/components`** and **`/ui/blocks`**.
+
+### Promote a component from a prototype
+
+KD UI can audit and import explicitly named components from another local
+Flask/Jinja project. Run the helper from this repository:
+
+```bash
+python scripts/kdui_promote.py status --source /path/to/prototype --kind component
+python scripts/kdui_promote.py component file_upload --source /path/to/prototype --dry-run
+python scripts/kdui_promote.py component file_upload --source /path/to/prototype
+```
+
+The helper can promote `component` or `block` files and automatically includes
+an optional same-named file from `app/static/js/components/`. It only updates
+the local KD UI working tree; it never commits or pushes. Add or update the KD
+UI gallery example, rebuild CSS, test, and review the diff before publishing.
 
 ---
 
@@ -98,8 +115,10 @@ kdui/
 │   │   └── gallery/             Live UI catalog
 │   └── static/
 │       ├── css/output.css       Compiled CSS (committed — no Node needed to run)
+│       ├── js/components/       Reusable component controllers
 │       └── js/vendor/           Basecoat JS runtime
 ├── scripts/sync_basecoat.mjs    Re-sync Basecoat assets after npm upgrade
+├── scripts/kdui_promote.py      Audit/import components from a prototype
 ├── .opencode/skill/             Bundled AI agent skill for scaffolding
 ├── AGENTS.md                    Rules for AI coding agents
 ├── HOWTO.md                     Full usage reference

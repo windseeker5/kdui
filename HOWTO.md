@@ -362,7 +362,7 @@ The `action` parameter accepts raw HTML — use a Basecoat `btn` link or button.
 {% set columns = [
   {"key": "name",   "label": "Name",   "sortable": true},
   {"key": "status", "label": "Status", "sortable": true},
-  {"key": "amount", "label": "Amount", "sortable": false}
+  {"key": "amount", "label": "Amount", "sortable": false, "align": "end"}
 ] %}
 
 {% call(row) data_table(
@@ -376,12 +376,16 @@ The `action` parameter accepts raw HTML — use a Basecoat `btn` link or button.
   <td>
     <span class="badge" data-variant="outline">{{ row.status }}</span>
   </td>
-  <td>{{ row.amount }}</td>
+  <td class="text-end">{{ row.amount }}</td>
 {% endcall %}
 ```
 
 The `caller(row)` pattern means you control the `<td>` cells — the macro
 handles the `<table>`, `<thead>`, sort links, and empty state automatically.
+Use `align="end"` on a column to align its heading, then add `text-end` to the
+matching `<td>` in the caller. Pass
+`scrollable=false` when rows contain popover-based controls such as
+`action_menu`, and use `class_` for wrapper-level layout overrides.
 
 ---
 
@@ -416,12 +420,15 @@ Pass all current query params in `extra_params` so they survive page changes.
       "options": [("", "All"), ("active", "Active"), ("inactive", "Inactive")],
       "value": status
     }
-  ]
+  ],
+  show_submit=true
 ) }}
 ```
 
 Add as many `filters` dicts as you need. Each becomes a `<select>` that
-auto-submits on change.
+auto-submits on change. Set `show_submit=false` when your application uses
+Enter-to-search and does not need a visible button. Use `submit_label` to
+change the button text and `class_` for form-level layout overrides.
 
 ---
 
@@ -447,6 +454,51 @@ auto-submits on change.
   action='<a href="/app/projects/new" class="btn">New project</a>'
 ) }}
 ```
+
+---
+
+### `timeline` — Chronological activity list
+
+```jinja
+{% from "components/timeline.html" import timeline %}
+
+{{ timeline(items=[
+  {"date": "Aug 14, 2026", "title": "Release deployed", "description": "Version 2.4 is live.", "badge": "Release"},
+  {"date": "Aug 12, 2026", "title": "Review approved", "badge": "Review", "badge_variant": "secondary"}
+]) }}
+```
+
+Each item accepts `date`, `title`, optional `description`, optional `badge`,
+and optional `badge_variant`. Use `class_` to extend the root layout.
+
+---
+
+### `file_upload` — File picker, dropzone, and image preview
+
+```jinja
+{% from "components/file_upload.html" import file_upload %}
+
+<form method="post" enctype="multipart/form-data">
+  <div id="photo-preview-container" class="hidden">
+    <img id="photo-preview" alt="Selected photo preview" />
+  </div>
+  {{ file_upload(
+    input_id="photo",
+    name="photo",
+    prompt="Add a photo",
+    hint="JPEG or PNG. 5 MB maximum.",
+    accept="image/jpeg,image/png",
+    preview_id="photo-preview",
+    preview_container_id="photo-preview-container"
+  ) }}
+  <button type="submit" class="btn">Upload</button>
+</form>
+```
+
+Click/tap selection works without JavaScript. Include
+`static/js/components/file_upload.js` for drag/drop, selection text, previews,
+loading states, and opt-in auto-submit. Browser `accept` filters are advisory;
+always validate uploaded files on the server.
 
 ---
 

@@ -70,6 +70,12 @@ to work within this Flask/Jinja starter.
     {% from "basecoat/dialog.html.jinja"  import dialog %}
     ```
 
+13. **Promote proven components from real applications explicitly.**
+    Run `python scripts/kdui_promote.py status --source <project>` to audit
+    drift, then promote one named component or block. The helper never commits
+    or pushes. Generalize app-specific content, add a KD UI gallery demo,
+    rebuild CSS, and verify the result before publishing.
+
 ---
 
 ## Project File Map
