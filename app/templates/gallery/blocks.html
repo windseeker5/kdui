@@ -53,11 +53,11 @@
   },
   {
     "name": "Login Page",
-    "description": "Centered login card on a muted background. Branding slot, email + password, footer link.",
+    "description": "Configurable login card with optional logo, CSRF, flash errors, password recovery, registration, and footer content. Loads no vendor JavaScript.",
     "url": url_for("public.login"),
     "file": "blocks/login_page.html",
     "extends": "layouts/public.html",
-    "vars": "none (static demo)"
+    "vars": "login_brand_name, login_brand_initial, login_logo_url, login_description, login_submit_label, login_forgot_url, login_register_url, login_footer_html (all optional)"
   },
   {
     "name": "Landing Page",

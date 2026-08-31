@@ -1,0 +1,13 @@
+/* KDUI accessibility defaults for touch input. */
+@media (pointer: coarse) {
+  .input,
+  .btn:not([data-size^="icon"]) {
+    min-height: 44px;
+  }
+
+  [data-touch-target] {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+}

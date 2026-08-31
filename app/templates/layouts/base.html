@@ -18,14 +18,17 @@
   </script>
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kdui.css') }}" />
   {% block head %}{% endblock %}
 </head>
 <body class="bg-background text-foreground min-h-screen">
   {% block body %}{% endblock %}
 
-  <script src="{{ url_for('static', filename='js/vendor/basecoat.all.min.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/components/file_upload.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block vendor_scripts %}
+    <script src="{{ url_for('static', filename='js/vendor/basecoat.all.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/components/file_upload.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% endblock %}
   {% block scripts %}{% endblock %}
 </body>
 </html>
