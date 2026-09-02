@@ -11,6 +11,32 @@
 ) }}
 
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <a href="{{ url_for('gallery.how_it_works') }}" class="card hover:bg-muted/40 transition-colors cursor-pointer no-underline">
+    <header>
+      <div class="mb-2 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <svg class="size-5 lucide lucide-book-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3Z"/><path d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3Z"/></svg>
+      </div>
+      <h2>Create an application</h2>
+      <p>Beginner step-by-step guide</p>
+    </header>
+    <section>
+      <p class="text-sm text-muted-foreground">Generate a separate to-do app, run it with Python, and copy only the UI components you need.</p>
+    </section>
+  </a>
+
+  <a href="{{ url_for('gallery.maintainer') }}" class="card hover:bg-muted/40 transition-colors cursor-pointer no-underline">
+    <header>
+      <div class="mb-2 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <svg class="size-5 lucide lucide-wrench" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg>
+      </div>
+      <h2>Maintain Flask Starter</h2>
+      <p>Contributor step-by-step guide</p>
+    </header>
+    <section>
+      <p class="text-sm text-muted-foreground">Set up the repository, add or promote components, update Basecoat, rebuild assets, test, and review changes.</p>
+    </section>
+  </a>
+
   <a href="{{ url_for('gallery.components') }}" class="card hover:bg-muted/40 transition-colors cursor-pointer no-underline">
     <header>
       <div class="mb-2 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">

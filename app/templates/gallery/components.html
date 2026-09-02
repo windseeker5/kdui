@@ -5,7 +5,7 @@
 {% from "components/empty_state.html" import empty_state %}
 {% from "components/metric_pill.html" import metric_pill %}
 {% from "components/action_menu.html" import action_menu %}
-{% from "components/data_table.html" import data_table %}
+{% from "components/data_table.html" import data_table, table_cell %}
 {% from "components/file_upload.html" import file_upload %}
 {% from "components/timeline.html" import timeline %}
 
@@ -161,36 +161,41 @@
 {% endcall %}
 
 {# ── Data Table ── #}
-{% call section("Data Table", "Sortable table macro with empty state, alignment controls, and optional action menus.", '
-{% from "components/data_table.html" import data_table %}
+{% call section("Data Table", "Sortable table macro with opt-in responsive records, alignment controls, and action menus.", '
+{% from "components/data_table.html" import data_table, table_cell %}
 
 {% set columns = [
-  {"key": "name", "label": "Company", "sortable": true},
-  {"key": "revenue", "label": "Revenue", "sortable": true, "align": "end"}
+  {"key": "date", "label": "Date", "sortable": true, "class_": "w-28"},
+  {"key": "topic", "label": "Topic", "sortable": true},
+  {"key": "_actions", "label": "", "class_": "w-28", "align": "end"}
 ] %}
-{% call(row) data_table(columns=columns, rows=companies, sort="name", order="asc", base_url="/companies") %}
-  <td class="font-medium">{{ row.name }}</td>
-  <td class="text-end">{{ row.revenue }}</td>
+{% call(row) data_table(columns=columns, rows=records, sort="date", base_url="/records", responsive=true) %}
+  {% call table_cell("Date", numeric=true) %}{{ row.date }}{% endcall %}
+  {% call table_cell("Topic", primary=true, summary=true, summary_title=row.topic, hide_label=true) %}{{ row.topic }}{% endcall %}
+  {% call table_cell("Actions", action=true, class_="text-end") %}<a href="/records/{{ row.id }}" class="btn" data-variant="outline" data-size="sm">View</a>{% endcall %}
 {% endcall %}
 ') %}
   {% set demo_columns = [
-    {"key": "name", "label": "Company", "sortable": true},
-    {"key": "status", "label": "Status", "sortable": false},
-    {"key": "revenue", "label": "Revenue", "sortable": true, "align": "end"}
+    {"key": "date",     "label": "Date",    "sortable": true,  "class_": "w-28"},
+    {"key": "type",     "label": "Type",    "sortable": false, "class_": "w-24"},
+    {"key": "contact",  "label": "Contact", "sortable": true,  "class_": "w-36"},
+    {"key": "topic",    "label": "Topic",   "sortable": true},
+    {"key": "_actions", "label": "",        "sortable": false, "align": "end", "class_": "w-28"}
   ] %}
   {% set demo_rows = [
-    {"id": 1, "name": "Acme Corp", "status": "Active", "revenue": 12400},
-    {"id": 2, "name": "Stark Industries", "status": "Active", "revenue": 92000},
-    {"id": 3, "name": "Initech", "status": "Inactive", "revenue": 8750}
+    {"id": 1, "date": "2026-08-14", "type": "Call", "contact": "Sabrina Martin", "topic": "Validation with the notary regarding the estate inventory and successor documentation."},
+    {"id": 2, "date": "2026-08-10", "type": "Meeting", "contact": "Andrey Pelletier", "topic": "Review sale offers before distributing the remaining estate assets."}
   ] %}
-  {% set demo_sort = request.args.get("sort", "name") if request.args.get("sort", "name") in ("name", "revenue") else "name" %}
+  {% set demo_sort = request.args.get("sort", "date") if request.args.get("sort", "date") in ("date", "contact", "topic") else "date" %}
   {% set demo_order = "desc" if request.args.get("order") == "desc" else "asc" %}
   {% set demo_rows = demo_rows | sort(attribute=demo_sort, reverse=(demo_order == "desc")) %}
   <div class="w-full">
-    {% call(row) data_table(columns=demo_columns, rows=demo_rows, sort=demo_sort, order=demo_order, base_url=url_for("gallery.components")) %}
-      <td class="font-medium">{{ row.name }}</td>
-      <td><span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span></td>
-      <td class="text-end">{{ "${:,.0f}".format(row.revenue) }}</td>
+    {% call(row) data_table(columns=demo_columns, rows=demo_rows, sort=demo_sort, order=demo_order, base_url=url_for("gallery.components"), responsive=true) %}
+      {% call table_cell("Date", numeric=true, class_="text-muted-foreground") %}{{ row.date }}{% endcall %}
+      {% call table_cell("Type") %}<span class="badge" data-variant="outline">{{ row.type }}</span>{% endcall %}
+      {% call table_cell("Contact", secondary=true) %}{{ row.contact }}{% endcall %}
+      {% call table_cell("Topic", primary=true, summary=true, summary_title=row.topic, hide_label=true) %}{{ row.topic }}{% endcall %}
+      {% call table_cell("Actions", action=true, class_="text-end") %}{{ action_menu(id="gallery-record-actions-" ~ row.id, items=[{"label": "View", "url": "/records/" ~ row.id}, {"label": "Edit", "url": "/records/" ~ row.id ~ "/edit"}]) }}{% endcall %}
     {% endcall %}
   </div>
 {% endcall %}

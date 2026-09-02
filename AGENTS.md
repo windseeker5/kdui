@@ -90,11 +90,12 @@ app/
                   settings_page | login_page | landing_page
     basecoat/     sidebar | tabs | dialog | select | combobox |
                   dropdown-menu | toast | popover | command
-    gallery/      index | components | blocks
+    gallery/      index | how_it_works | maintainer | components | blocks
   blueprints/
     public/       routes: / and /login
     dashboard/    routes: /app/dashboard, /app/customers, /app/settings
-    gallery/      routes: /ui, /ui/components, /ui/blocks
+    gallery/      routes: /ui, /ui/how-it-works, /ui/maintainer,
+                         /ui/components, /ui/blocks
   static/
     css/output.css   compiled Tailwind + Basecoat (committed)
     js/vendor/basecoat.all.min.js
@@ -104,15 +105,20 @@ app/
 
 ## Starting a New Project
 
+Generate a separate, minimal Flask application from this toolbox:
+
 ```bash
-git clone <this-repo> my-new-project
-cd my-new-project
+python scripts/kdui.py new ../my-new-project
+cd ../my-new-project
 python -m venv .venv && .venv/Scripts/activate   # Windows
 pip install -r requirements.txt
-flask --app wsgi run --debug
+python wsgi.py
 ```
 
-To add a new block:
+Generated applications use precompiled assets and do not require npm. npm is
+only used while maintaining KD UI itself.
+
+To add a new block to the KD UI toolbox:
 1. Create `app/templates/blocks/my_block.html` (extends a layout).
 2. Add a route in the appropriate blueprint.
 3. Document it in `app/templates/gallery/blocks.html`.

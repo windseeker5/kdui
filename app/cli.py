@@ -552,41 +552,20 @@ def scaffold_resource(name, fields, icon):
     else:
         click.echo(click.style("  [!!] Could not auto-register blueprint - add it manually to app/__init__.py", fg="yellow"))
 
-    # 4. Add sidebar nav item — appended as a new group after the Main group
+    # 4. Add a sidebar group after a persistent, non-rendered menu marker.
+    # Keeping the marker in place allows more than one resource to be scaffolded.
     Names = name.capitalize() + "s"
     icon_svg = _icon_svg(icon).replace("'", "\\'")
-    # The marker ~~SCAFFOLD_NAV_END~~ sits right after the closing of the Main group ]},
-    # We replace it with a new group entry + the marker (so future scaffolds append too)
     nav_group = (
-        '\n  {{ "type": "group", "label": "{}", "items": [\n'
+        '  {{ "type": "group", "label": "{}", "items": [\n'
         '    {{ "type": "item", "label": "{}", '
         '"url": url_for("{}.list_{}"), '
         '"icon": \'{}\', '
         '"current": ("{}" in request.endpoint) }}\n'
-        '  ]}},~~SCAFFOLD_NAV_END~~'
+        '  ]}},'
     ).format(Names, Names, name, name, icon_svg, name)
     app_html = os.path.join(app_dir, "templates", "layouts", "app.html")
-    ok3 = insert_after_marker(app_html, "~~SCAFFOLD_NAV_END~~", ""  # marker already replaced inline
-    )
-    # Use direct replacement instead
-    with open(app_html, encoding="utf-8") as f:
-        app_content = f.read()
-    if "~~SCAFFOLD_NAV_END~~" in app_content:
-        app_content = app_content.replace("~~SCAFFOLD_NAV_END~~", nav_group, 1)
-        # The nav_group itself ends with ~~SCAFFOLD_NAV_END~~ for future scaffolds.
-        # Jinja cannot have ~~ in the template, so we must keep it ONLY inside
-        # a Python string marker that Jinja never sees. Since it's inside the
-        # Jinja set block, strip it out after insertion and rely on future scaffolds
-        # searching for the last "]}},~~SCAFFOLD_NAV_END~~" they inserted.
-        # For now: the marker inside nav_group already replaced the old one,
-        # so the file now has exactly one occurrence. Keep it — Jinja actually
-        # errors on ~ inside set blocks. Strip any remaining marker.
-        app_content = app_content.replace("~~SCAFFOLD_NAV_END~~", "")
-        with open(app_html, "w", encoding="utf-8") as f:
-            f.write(app_content)
-        ok3 = True
-    else:
-        ok3 = False
+    ok3 = insert_after_marker(app_html, '  { "type": "scaffold-marker" },', nav_group)
     if ok3:
         click.echo(click.style("  [OK] Added sidebar nav item in layouts/app.html", fg="green"))
     else:
@@ -626,8 +605,8 @@ def scaffold_resource(name, fields, icon):
 
     # Done
     click.echo("\n" + click.style("Done!", bold=True, fg="green") + " Visit:\n")
-    click.echo("    http://localhost:5000/app/{}".format(name))
-    click.echo("    http://localhost:5000/ui/blocks\n")
+    click.echo("    http://localhost:5005/app/{}".format(name))
+    click.echo("    http://localhost:5005/ui/blocks\n")
     click.echo(click.style(
         "  Tip: open the generated _list / _detail / _form templates\n"
         "  to customize badge colors, add columns, or connect real data.\n", dim=True))
