@@ -1,0 +1,49 @@
+{#
+  Switch / toggle component.
+
+  Usage:
+    {% from "components/switch.html" import switch %}
+    {{ switch(id="airplane-mode", label="Airplane Mode") }}
+    {{ switch(id="focus", label="Share across devices", description="...", checked=true) }}
+
+  Params:
+    id          {string}  Input id (also used for label association).
+    name        {string}  Optional name; defaults to id.
+    label       {string}  Label text.
+    description {string}  Optional helper text below the label.
+    checked     {bool}    Default False.
+    disabled    {bool}    Default False.
+    size        {string}  "sm" for a smaller switch.
+    class_      {string}  Extra classes for the wrapper.
+    attrs       {dict}    Additional attributes for the input.
+#}
+
+{% macro switch(id, name=None, label=None, description=None, checked=False, disabled=False, size=None, class_='', attrs={}) %}
+{% set input_name = name or id %}
+<div
+  role="group"
+  class="field {{ class_ }}"
+  data-orientation="horizontal"
+  {% if description %}aria-describedby="{{ id }}-description"{% endif %}
+>
+  {% if description %}
+    <section>
+      <label for="{{ id }}">{{ label }}</label>
+      <p id="{{ id }}-description">{{ description }}</p>
+    </section>
+  {% elif label %}
+    <label for="{{ id }}">{{ label }}</label>
+  {% endif %}
+  <input
+    type="checkbox"
+    id="{{ id }}"
+    name="{{ input_name }}"
+    role="switch"
+    class="input"
+    {% if checked %}checked{% endif %}
+    {% if disabled %}disabled{% endif %}
+    {% if size %}data-size="{{ size }}"{% endif %}
+    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+  />
+</div>
+{% endmacro %}

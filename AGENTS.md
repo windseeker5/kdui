@@ -112,9 +112,10 @@ python scripts/kdui.py new ../my-new-project
 cd ../my-new-project
 python -m venv .venv && .venv/Scripts/activate   # Windows
 pip install -r requirements.txt
-python wsgi.py
+python wsgi.py --port 5055
 ```
 
+The port is chosen at runtime and may be replaced with any available port.
 Generated applications use precompiled assets and do not require npm. npm is
 only used while maintaining KD UI itself.
 

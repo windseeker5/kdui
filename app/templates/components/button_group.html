@@ -1,0 +1,31 @@
+{#
+  Button group component.
+
+  Usage:
+    {% from "components/button_group.html" import button_group %}
+    {{ button_group(items=[
+      '<button type="button" class="btn" data-variant="outline">Archive</button>' | safe,
+      '<button type="button" class="btn" data-variant="outline">Report</button>' | safe
+    ], aria_label="Message actions") }}
+
+  Params:
+    items       {list}   Raw HTML strings for each grouped control.
+    aria_label  {string} Accessible label for the group.
+    vertical    {bool}   Stack vertically.
+    class_      {string} Extra classes for the group wrapper.
+    attrs       {dict}   Additional attributes for the group wrapper.
+#}
+
+{% macro button_group(items=[], aria_label=None, vertical=False, class_='', attrs={}) %}
+<div
+  role="group"
+  aria-label="{{ aria_label or '' }}"
+  class="button-group {{ class_ }}"
+  {% if vertical %}data-orientation="vertical"{% endif %}
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  {% for item in items %}
+    {{ item | safe }}
+  {% endfor %}
+</div>
+{% endmacro %}

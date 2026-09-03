@@ -1,0 +1,55 @@
+{#
+  Popover component.
+
+  Usage:
+    {% from "components/popover.html" import popover %}
+    {% call popover(trigger="Open popover", title="Dimensions", description="Set the dimensions.") %}
+      <p>Your popover content here.</p>
+    {% endcall %}
+
+  Params:
+    trigger      {string}  Label text for the popover trigger button.
+    title        {string}  Optional header title.
+    description  {string}  Optional header description.
+    width        {string}  Width utility class. Default "w-72".
+    align        {string}  Optional alignment: "start" | "center" | "end".
+    class_       {string}  Extra classes for the root popover wrapper.
+    attrs        {dict}    Additional attributes for the root wrapper.
+#}
+
+{% macro popover(trigger, title=None, description=None, width='w-72', align=None, class_='', attrs={}) %}
+{% set id = 'popover-' ~ (range(100000, 999999) | random | string) %}
+<div
+  id="{{ id }}"
+  class="popover {{ class_ }}"
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  <button
+    id="{{ id }}-trigger"
+    type="button"
+    aria-expanded="false"
+    aria-controls="{{ id }}-popover"
+    class="btn"
+    data-variant="outline"
+  >
+    {{ trigger }}
+  </button>
+  <div
+    id="{{ id }}-popover"
+    data-popover
+    aria-hidden="true"
+    class="{{ width }}"
+    {% if align %}data-align="{{ align }}"{% endif %}
+  >
+    {% if title or description %}
+      <header>
+        {% if title %}<h4>{{ title | safe }}</h4>{% endif %}
+        {% if description %}<p>{{ description | safe }}</p>{% endif %}
+      </header>
+    {% endif %}
+    {% if caller is defined %}
+      {{ caller() }}
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

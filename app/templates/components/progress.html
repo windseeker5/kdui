@@ -1,0 +1,43 @@
+{#
+  Progress bar component.
+
+  Usage:
+    {% from "components/progress.html" import progress %}
+    {{ progress(value=66) }}
+    {{ progress(value=40, max=100, label="Upload progress", show_value=true) }}
+
+  Params:
+    value       {int|float} Current value.
+    max         {int}       Maximum value. Default 100.
+    label       {string}    Optional label rendered above the bar.
+    show_value  {bool}      Show the percentage next to the label.
+    class_      {string}    Extra classes for the root element (or the wrapper when a label is used).
+    bar_class   {string}    Extra classes for the inner bar.
+    attrs       {dict}      Additional HTML attributes for the progress element.
+#}
+
+{% macro progress(value=0, max=100, label=None, show_value=false, class_='', bar_class='', attrs={}) %}
+{% set percent = ((value / max) * 100) | round | int %}
+{% set bar_attrs = attrs or {} %}
+{% if label %}
+<div class="field w-full {{ class_ }}">
+  <div class="flex items-center gap-3 text-sm">
+    <label id="{{ label | lower | replace(' ', '-') }}-label">{{ label }}</label>
+    {% if show_value %}<output class="ms-auto tabular-nums">{{ percent }}%</output>{% endif %}
+  </div>
+{% endif %}
+  <div
+    class="progress {{ class_ if not label else '' }}"
+    role="progressbar"
+    aria-valuenow="{{ value }}"
+    aria-valuemin="0"
+    aria-valuemax="{{ max }}"
+    {% if label %}aria-labelledby="{{ label | lower | replace(' ', '-') }}-label"{% endif %}
+    {% for key, val in bar_attrs.items() %}{{ key }}="{{ val }}"{% endfor %}
+  >
+    <span class="{{ bar_class }}" style="width: {{ percent }}%"></span>
+  </div>
+{% if label %}
+</div>
+{% endif %}
+{% endmacro %}
