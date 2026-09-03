@@ -1,0 +1,55 @@
+{#
+  Drawer component (uses native <dialog> like Basecoat).
+
+  Usage:
+    {% from "components/drawer.html" import drawer %}
+    {% call drawer(trigger="Open drawer", title="Move Goal", description="Set your daily activity goal.", side="right") %}
+      <p>Drawer body content goes here.</p>
+    {% endcall %}
+
+  Params:
+    trigger      {string}  Button label.
+    title        {string}  Drawer header title.
+    description  {string}  Drawer header description.
+    side         {string}  "top" | "right" | "bottom" | "left". Default is right (unset class behavior).
+    size         {string}  "sm" for a smaller drawer.
+    class_       {string}  Extra classes for the dialog element.
+    attrs        {dict}    Additional attributes for the dialog element.
+#}
+
+{% macro drawer(trigger='Open drawer', title=None, description=None, side=None, size=None, class_='', attrs={}) %}
+{% set id = 'drawer-' ~ (range(100000, 999999) | random | string) %}
+<button
+  type="button"
+  class="btn"
+  data-variant="outline"
+  onclick="document.getElementById('{{ id }}').showModal()"
+>
+  {{ trigger }}
+</button>
+<dialog
+  id="{{ id }}"
+  class="drawer {{ class_ }}"
+  {% if title %}aria-labelledby="{{ id }}-title"{% endif %}
+  {% if description %}aria-describedby="{{ id }}-description"{% endif %}
+  {% if side %}data-side="{{ side }}"{% endif %}
+  {% if size %}data-size="{{ size }}"{% endif %}
+  onclick="if (event.target === this) this.close()"
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  <article>
+    {% if title or description %}
+      <header>
+        {% if title %}<h2 id="{{ id }}-title">{{ title | safe }}</h2>{% endif %}
+        {% if description %}<p id="{{ id }}-description">{{ description | safe }}</p>{% endif %}
+      </header>
+    {% endif %}
+    {% if caller is defined %}
+      <section>{{ caller() }}</section>
+    {% endif %}
+    <footer>
+      <button type="button" class="btn" data-variant="outline" onclick="this.closest('dialog').close()">Close</button>
+    </footer>
+  </article>
+</dialog>
+{% endmacro %}

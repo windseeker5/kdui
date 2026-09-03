@@ -1,0 +1,74 @@
+{#
+  Avatar and avatar-group components.
+
+  Usage:
+    {% from "components/avatar.html" import avatar, avatar_group %}
+
+    {{ avatar(src="/static/img/user.png", alt="Ken Dresdell", fallback="KD") }}
+    {{ avatar(fallback="AB", size="sm", shape="rounded") }}
+    {{ avatar(src="/static/img/user.png", badge=True, badge_class="bg-green-600") }}
+
+    {{ avatar_group([
+      {"src": "/static/img/u1.png", "alt": "User 1", "fallback": "U1"},
+      {"src": "/static/img/u2.png", "alt": "User 2", "fallback": "U2"},
+    ], max=3, count=5) }}
+
+  Params for avatar:
+    src          {string}  Image URL. Both <img> and fallback <span> are rendered;
+                           Basecoat shows the fallback if the image fails to load.
+    alt          {string}  alt text for the image.
+    fallback     {string}  Initials or text shown when no image is provided / image fails.
+    size         {string}  "sm" | "lg". Omit for default.
+    shape        {string}  "circle" (default) | "rounded" (square-ish rounded corners).
+    badge        {bool|string}  True renders an empty badge dot. Pass an SVG string to
+                                render an icon badge.
+    badge_class  {string}  Extra Tailwind classes for the badge (e.g. "bg-green-600").
+    class_       {string}  Extra classes for the root <span>.
+    attrs        {dict}    Additional HTML attributes for the root <span>.
+
+  Params for avatar_group:
+    avatars      {list}    List of dicts passed as kwargs to avatar().
+    max          {int}     Maximum avatars to display before collapsing the rest.
+    count        {int}     Total count shown as "+N" or used with an icon badge.
+    count_icon   {string} Optional SVG string to show inside the count bubble.
+    size         {string}  Size passed down to each avatar.
+    class_       {string}  Extra classes for the group wrapper.
+    attrs        {dict}    Additional HTML attributes for the group wrapper.
+#}
+
+{% macro avatar(src=None, alt='', fallback=None, size=None, shape='circle', badge=None, badge_class=None, class_='', attrs={}) %}
+{% set initials = fallback or (alt.split(' ') | map('first') | join | upper) %}
+<span
+  class="avatar {{ 'rounded-lg' if shape == 'rounded' else '' }} {{ class_ }}"
+  {% if size %}data-size="{{ size }}"{% endif %}
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  {% if src %}
+    <img src="{{ src }}" alt="{{ alt }}" loading="lazy" />
+  {% endif %}
+  <span>{{ initials }}</span>
+  {% if badge %}
+    <span class="avatar-badge {{ badge_class or '' }}">
+      {% if badge is string and badge.startswith('<') %}{{ badge | safe }}{% endif %}
+    </span>
+  {% endif %}
+</span>
+{% endmacro %}
+
+{% macro avatar_group(avatars=[], max=None, count=None, count_icon=None, size=None, class_='', attrs={}) %}
+{% set shown = avatars[:max] if max else avatars %}
+{% set remaining = (count - shown | length) if count else (avatars | length - shown | length) %}
+<div
+  class="avatar-group {{ class_ }}"
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  {% for a in shown %}
+    {{ avatar(size=size, **a) }}
+  {% endfor %}
+  {% if remaining > 0 %}
+    <span data-count aria-label="{{ remaining }} additional avatars">
+      {% if count_icon %}{{ count_icon | safe }}{% else %}+{{ remaining }}{% endif %}
+    </span>
+  {% endif %}
+</div>
+{% endmacro %}

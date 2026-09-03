@@ -49,10 +49,19 @@ cd ../my-todo
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python wsgi.py
+python wsgi.py --port 5055
 ```
 
-Open <http://127.0.0.1:5005>.
+Open <http://127.0.0.1:5055>. Replace `5055` with any available port.
+
+For access from another device on a trusted local network:
+
+```bash
+python wsgi.py --host 0.0.0.0 --port 5055
+```
+
+Open `http://YOUR-COMPUTER-IP:5055` on the other device. Never expose Flask
+debug mode to the public internet or an untrusted network.
 
 The generated example can add, complete, and delete tasks. It stores tasks in
 memory so you can understand the complete application before choosing a
@@ -122,7 +131,7 @@ To work on KD UI itself:
 
 ```bash
 pip install -r requirements.txt
-python wsgi.py
+python wsgi.py --port 5005
 ```
 
 Open:

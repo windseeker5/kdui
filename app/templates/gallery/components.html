@@ -8,6 +8,21 @@
 {% from "components/data_table.html" import data_table, table_cell %}
 {% from "components/file_upload.html" import file_upload %}
 {% from "components/timeline.html" import timeline %}
+{% from "components/avatar.html" import avatar, avatar_group %}
+{% from "components/progress.html" import progress %}
+{% from "components/skeleton.html" import skeleton %}
+{% from "components/breadcrumb.html" import breadcrumb %}
+{% from "components/kbd.html" import kbd, kbd_combo %}
+{% from "components/switch.html" import switch %}
+{% from "components/checkbox.html" import checkbox %}
+{% from "components/radio.html" import radio_group %}
+{% from "components/textarea.html" import textarea %}
+{% from "components/popover.html" import popover %}
+{% from "components/drawer.html" import drawer %}
+{% from "components/accordion.html" import accordion %}
+{% from "components/button_group.html" import button_group %}
+{% from "components/alert_dialog.html" import alert_dialog %}
+{% from "components/chart.html" import chart %}
 
 {% block title %}Components – UI Gallery{% endblock %}
 {% block breadcrumb %}
@@ -40,6 +55,98 @@
   </section>
 </div>
 {% endmacro %}
+
+{# ── Avatar ── #}
+{% call section("Avatar", "Profile picture with image fallback, sizes, badge, and rounded shape.", '
+{% from "components/avatar.html" import avatar %}
+{{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN") }}
+{{ avatar(fallback="KD", size="sm") }}
+{{ avatar(fallback="AB", size="lg", shape="rounded") }}
+{{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN", badge=true, badge_class="bg-green-600") }}
+') %}
+  <div class="flex flex-wrap items-center gap-4">
+    {{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN") }}
+    {{ avatar(fallback="KD", size="sm") }}
+    {{ avatar(fallback="AB", size="lg", shape="rounded") }}
+    {{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN", badge=true, badge_class="bg-green-600") }}
+  </div>
+{% endcall %}
+
+{# ── Avatar Group ── #}
+{% call section("Avatar Group", "Stacked avatars with a remaining-count bubble.", '
+{% from "components/avatar.html" import avatar_group %}
+{{ avatar_group([
+  {"src": "https://github.com/shadcn.png", "alt": "shadcn", "fallback": "CN"},
+  {"src": "https://github.com/maxleiter.png", "alt": "maxleiter", "fallback": "ML"},
+  {"src": "https://github.com/evilrabbit.png", "alt": "evilrabbit", "fallback": "ER"}
+], max=3, count=5) }}
+') %}
+  {{ avatar_group([
+    {"src": "https://github.com/shadcn.png", "alt": "shadcn", "fallback": "CN"},
+    {"src": "https://github.com/maxleiter.png", "alt": "maxleiter", "fallback": "ML"},
+    {"src": "https://github.com/evilrabbit.png", "alt": "evilrabbit", "fallback": "ER"}
+  ], max=3, count=5) }}
+{% endcall %}
+
+{# ── Progress ── #}
+{% call section("Progress", "Accessible progress bar with optional label and percentage.", '
+{% from "components/progress.html" import progress %}
+{{ progress(value=66, label="Upload progress", show_value=true) }}
+') %}
+  {{ progress(value=66, label="Upload progress", show_value=true) }}
+{% endcall %}
+
+{# ── Skeleton ── #}
+{% call section("Skeleton", "Loading placeholders that match Basecoat’s pulse animation.", '
+{% from "components/skeleton.html" import skeleton %}
+<div class="flex items-center gap-4">
+  {{ skeleton(width="2.5rem", height="2.5rem", circle=true) }}
+  <div class="grid gap-2">
+    {{ skeleton(width="250px", height="1rem") }}
+    {{ skeleton(width="200px", height="1rem") }}
+  </div>
+</div>
+') %}
+  <div class="flex items-center gap-4">
+    {{ skeleton(width="2.5rem", height="2.5rem", circle=true) }}
+    <div class="grid gap-2">
+      {{ skeleton(width="250px", height="1rem") }}
+      {{ skeleton(width="200px", height="1rem") }}
+    </div>
+  </div>
+{% endcall %}
+
+{# ── Breadcrumb ── #}
+{% call section("Breadcrumb", "Navigation trail using Basecoat’s .breadcrumb styles.", '
+{% from "components/breadcrumb.html" import breadcrumb %}
+{{ breadcrumb(items=[
+  {"label": "Home", "url": "/"},
+  {"label": "Customers", "url": "/customers"},
+  {"label": "Acme Corp", "current": true}
+]) }}
+') %}
+  {{ breadcrumb(items=[
+    {"label": "Home", "url": "/"},
+    {"label": "Customers", "url": "/customers"},
+    {"label": "Acme Corp", "current": true}
+  ]) }}
+{% endcall %}
+
+{# ── KBD ── #}
+{% call section("KBD", "Keyboard keys and shortcut combos.", '
+{% from "components/kbd.html" import kbd, kbd_combo %}
+{{ kbd_combo(["Ctrl", "B"]) }}
+{{ kbd("⌘") }}
+') %}
+  <div class="flex flex-wrap items-center gap-4">
+    {{ kbd_combo(["Ctrl", "B"]) }}
+    <span class="inline-flex items-center gap-1">
+      {{ kbd("⌘") }}
+      {{ kbd("⇧") }}
+      {{ kbd("K") }}
+    </span>
+  </div>
+{% endcall %}
 
 {# ── Button ── #}
 {% call section("Button", "Core interactive element. Use data-variant and data-size.", '
@@ -261,6 +368,165 @@
   {{ metric_pill(label="Net Worth", value="$412,300") }}
   {{ metric_pill(label="Debts", value="$18,900", trend="down") }}
   {{ metric_pill(label="Assets Sold", value="+3 this month", trend="up") }}
+{% endcall %}
+
+{# ── Switch ── #}
+{% call section("Switch", "Toggle control with optional description. Uses native checkbox + role=switch.", '
+{% from "components/switch.html" import switch %}
+{{ switch(id="gallery-airplane", label="Airplane Mode") }}
+{{ switch(
+  id="gallery-focus",
+  label="Share across devices",
+  description="Focus is shared across devices and turns off when you leave the app.",
+  checked=true
+) }}
+') %}
+  <div class="grid w-full max-w-md gap-3">
+    {{ switch(id="gallery-airplane", label="Airplane Mode") }}
+    {{ switch(
+      id="gallery-focus",
+      label="Share across devices",
+      description="Focus is shared across devices and turns off when you leave the app.",
+      checked=true
+    ) }}
+  </div>
+{% endcall %}
+
+{# ── Checkbox ── #}
+{% call section("Checkbox", "Single checkbox with optional description.", '
+{% from "components/checkbox.html" import checkbox %}
+{{ checkbox(id="gallery-terms", name="terms", label="Accept terms and conditions", description="By clicking this checkbox, you agree to the terms.") }}
+') %}
+  <div class="grid w-full max-w-md gap-3">
+    {{ checkbox(id="gallery-terms", name="terms", label="Accept terms and conditions", description="By clicking this checkbox, you agree to the terms.") }}
+    {{ checkbox(id="gallery-newsletter", name="newsletter", label="Email me weekly updates", checked=true) }}
+  </div>
+{% endcall %}
+
+{# ── Radio Group ── #}
+{% call section("Radio Group", "Accessible radio group with descriptions.", '
+{% from "components/radio.html" import radio_group %}
+{{ radio_group(name="plan", label="Choose a plan", options=[
+  {"value": "plus", "label": "Plus", "description": "For individuals and small teams."},
+  {"value": "pro", "label": "Pro", "description": "For growing businesses."},
+  {"value": "enterprise", "label": "Enterprise", "description": "For large teams."}
+], selected="pro") }}
+') %}
+  {{ radio_group(name="plan", label="Choose a plan", options=[
+    {"value": "plus", "label": "Plus", "description": "For individuals and small teams."},
+    {"value": "pro", "label": "Pro", "description": "For growing businesses."},
+    {"value": "enterprise", "label": "Enterprise", "description": "For large teams."}
+  ], selected="pro") }}
+{% endcall %}
+
+{# ── Textarea ── #}
+{% call section("Textarea", "Multi-line text input with label and description.", '
+{% from "components/textarea.html" import textarea %}
+{{ textarea(id="gallery-message", name="message", label="Message", description="Write a short message.", placeholder="Type your message here…") }}
+') %}
+  <div class="w-full max-w-md">
+    {{ textarea(id="gallery-message", name="message", label="Message", description="Write a short message.", placeholder="Type your message here…") }}
+  </div>
+{% endcall %}
+
+{# ── Popover ── #}
+{% call section("Popover", "Displays content triggered by a button. Initialized by Basecoat’s popover behavior.", '
+{% from "components/popover.html" import popover %}
+{% call popover(trigger="Open popover", title="Dimensions", description="Set the dimensions for the layer.", width="w-72") %}
+  <p class="text-sm">Your custom content here.</p>
+{% endcall %}
+') %}
+  {% call popover(trigger="Open popover", title="Dimensions", description="Set the dimensions for the layer.", width="w-72") %}
+    <form class="grid gap-2" onsubmit="event.preventDefault()">
+      <div class="grid grid-cols-3 items-center gap-4">
+        <label for="gallery-popover-width" class="text-sm">Width</label>
+        <input type="text" id="gallery-popover-width" value="100%" class="input col-span-2 h-8" />
+      </div>
+    </form>
+  {% endcall %}
+{% endcall %}
+
+{# ── Drawer ── #}
+{% call section("Drawer", "Slide-out panel using the native <dialog> element. Supports all four sides.", '
+{% from "components/drawer.html" import drawer %}
+{% call drawer(trigger="Open drawer", title="Move Goal", description="Set your daily activity goal.", side="right") %}
+  <p>Drawer body content.</p>
+{% endcall %}
+') %}
+  {% call drawer(trigger="Open drawer", title="Move Goal", description="Set your daily activity goal.", side="right") %}
+    <p class="text-sm text-muted-foreground">This drawer slides in from the right.</p>
+  {% endcall %}
+{% endcall %}
+
+{# ── Accordion ── #}
+{% call section("Accordion", "Native <details> accordion with Basecoat styling.", '
+{% from "components/accordion.html" import accordion %}
+{{ accordion(items=[
+  {"title": "Shipping options", "content": "We offer standard, express, and overnight shipping."},
+  {"title": "Return policy", "content": "Return within 30 days.", "open": true}
+]) }}
+') %}
+  {{ accordion(items=[
+    {"title": "Shipping options", "content": "We offer standard, express, and overnight shipping."},
+    {"title": "Return policy", "content": "Return within 30 days.", "open": true},
+    {"title": "Contact support", "content": "Email us anytime at support@example.com."}
+  ]) }}
+{% endcall %}
+
+{# ── Button Group ── #}
+{% call section("Button Group", "Groups related buttons or controls together.", '
+{% from "components/button_group.html" import button_group %}
+{{ button_group(items=[
+  "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Archive</button>" | safe,
+  "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Report</button>" | safe
+], aria_label="Message actions") }}
+') %}
+  {{ button_group(items=[
+    "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Archive</button>" | safe,
+    "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Report</button>" | safe,
+    "<button type=\"button\" class=\"btn\" data-variant=\"outline\" data-size=\"icon\" aria-label=\"Add item\"><svg class=\"lucide lucide-plus size-4\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg></button>" | safe
+  ], aria_label="Message actions") }}
+{% endcall %}
+
+{# ── Alert Dialog ── #}
+{% call section("Alert Dialog", "Confirmation dialog for destructive or important actions.", '
+{% from "components/alert_dialog.html" import alert_dialog %}
+{{ alert_dialog(
+  trigger="Delete Chat",
+  title="Delete this chat?",
+  description="This action cannot be undone.",
+  confirm_label="Delete",
+  confirm_variant="destructive"
+) }}
+') %}
+  {{ alert_dialog(
+    trigger="Delete Chat",
+    title="Delete this chat?",
+    description="This action cannot be undone. This will permanently delete the chat and remove it from your history.",
+    confirm_label="Delete",
+    confirm_variant="destructive"
+  ) }}
+{% endcall %}
+
+{# ── Chart ── #}
+{% call section("Chart", "Lightweight server-rendered bar chart. No external JS library required.", '
+{% from "components/chart.html" import chart %}
+{{ chart(data=[
+  {"month": "Jan", "sales": 120},
+  {"month": "Feb", "sales": 200},
+  {"month": "Mar", "sales": 150}
+], label_key="month", value_key="sales") }}
+') %}
+  <div class="w-full max-w-lg">
+    {{ chart(data=[
+      {"month": "Jan", "sales": 120},
+      {"month": "Feb", "sales": 200},
+      {"month": "Mar", "sales": 150},
+      {"month": "Apr", "sales": 180},
+      {"month": "May", "sales": 240},
+      {"month": "Jun", "sales": 210}
+    ], label_key="month", value_key="sales") }}
+  </div>
 {% endcall %}
 
 {# ── Theme Switcher ── #}

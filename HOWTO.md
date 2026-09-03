@@ -44,10 +44,19 @@ cd ../my-todo
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python wsgi.py
+python wsgi.py --port 5055
 ```
 
-Open <http://127.0.0.1:5005>.
+Open <http://127.0.0.1:5055>. Replace `5055` with any available port.
+
+For access from another device on a trusted local network:
+
+```bash
+python wsgi.py --host 0.0.0.0 --port 5055
+```
+
+Open `http://YOUR-COMPUTER-IP:5055` on that device. Never expose Flask debug
+mode to the public internet or an untrusted network.
 
 No npm command is required. The generator copies precompiled CSS and JavaScript.
 
@@ -139,7 +148,7 @@ Run the showroom:
 
 ```bash
 pip install -r requirements.txt
-python wsgi.py
+python wsgi.py --port 5005
 ```
 
 Useful pages:

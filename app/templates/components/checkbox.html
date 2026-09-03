@@ -1,0 +1,56 @@
+{#
+  Checkbox component.
+
+  Usage:
+    {% from "components/checkbox.html" import checkbox %}
+    {{ checkbox(id="terms", name="terms", label="Accept terms and conditions") }}
+
+  Params:
+    id          {string}  Input id.
+    name        {string}  Input name.
+    label       {string}  Label text.
+    description {string}  Optional helper text below the label.
+    checked     {bool}    Default False.
+    disabled    {bool}    Default False.
+    class_      {string}  Extra classes for the wrapper.
+    attrs       {dict}    Additional attributes for the input.
+#}
+
+{% macro checkbox(id, name=None, label=None, description=None, checked=False, disabled=False, class_='', attrs={}) %}
+{% set input_name = name or id %}
+{% if description %}
+<div
+  role="group"
+  class="field {{ class_ }}"
+  data-orientation="horizontal"
+  aria-describedby="{{ id }}-description"
+>
+  <input
+    type="checkbox"
+    id="{{ id }}"
+    name="{{ input_name }}"
+    class="input"
+    {% if checked %}checked{% endif %}
+    {% if disabled %}disabled{% endif %}
+    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+  />
+  <section>
+    <label for="{{ id }}">{{ label }}</label>
+    <p id="{{ id }}-description">{{ description }}</p>
+  </section>
+</div>
+{% else %}
+<div class="flex items-center gap-3 {{ class_ }}">
+  <input
+    type="checkbox"
+    id="{{ id }}"
+    name="{{ input_name }}"
+    class="input"
+    {% if checked %}checked{% endif %}
+    {% if disabled %}disabled{% endif %}
+    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+  />
+  <label for="{{ id }}">{{ label }}</label>
+</div>
+{% endif %}
+{% endmacro %}

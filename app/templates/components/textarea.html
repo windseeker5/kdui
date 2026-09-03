@@ -1,0 +1,48 @@
+{#
+  Textarea component.
+
+  Usage:
+    {% from "components/textarea.html" import textarea %}
+    {{ textarea(id="message", name="message", label="Message", placeholder="Type your message…") }}
+
+  Params:
+    id          {string}  Textarea id.
+    name        {string}  Textarea name; defaults to id.
+    label       {string}  Optional label text.
+    description {string}  Optional helper/hint text.
+    placeholder {string}  Placeholder text.
+    value       {string}  Pre-filled content.
+    rows        {int}     Number of rows. Default 4.
+    disabled    {bool}    Default False.
+    class_      {string}  Extra classes for the textarea or wrapper.
+    attrs       {dict}    Additional attributes for the textarea.
+#}
+
+{% macro textarea(id, name=None, label=None, description=None, placeholder=None, value=None, rows=4, disabled=False, class_='', attrs={}) %}
+{% set input_name = name or id %}
+{% if label or description %}
+<div role="group" class="field {{ class_ }}">
+  {% if label %}<label for="{{ id }}">{{ label }}</label>{% endif %}
+  <textarea
+    id="{{ id }}"
+    name="{{ input_name }}"
+    class="textarea"
+    rows="{{ rows }}"
+    {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+    {% if disabled %}disabled{% endif %}
+    {% for key, val in (attrs or {}).items() %}{{ key }}="{{ val }}"{% endfor %}
+  >{{ value or '' }}</textarea>
+  {% if description %}<p>{{ description }}</p>{% endif %}
+</div>
+{% else %}
+<textarea
+  id="{{ id }}"
+  name="{{ input_name }}"
+  class="textarea {{ class_ }}"
+  rows="{{ rows }}"
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% for key, val in (attrs or {}).items() %}{{ key }}="{{ val }}"{% endfor %}
+>{{ value or '' }}</textarea>
+{% endif %}
+{% endmacro %}

@@ -68,8 +68,13 @@ git pull</code></pre>
 python -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python wsgi.py</code></pre>
-        <p class="text-sm text-muted-foreground">Open <code>http://127.0.0.1:5005</code>. You can add, complete, and delete tasks.</p>
+python wsgi.py --port 5055</code></pre>
+        <p class="text-sm text-muted-foreground">Open <code>http://127.0.0.1:5055</code>. We chose port 5055 for this example; replace it with any available port.</p>
+        <div>
+          <p class="mb-2 text-sm font-medium">Access it from another device on your trusted local network:</p>
+          <pre class="overflow-x-auto rounded-md bg-muted p-4 text-sm"><code>python wsgi.py --host 0.0.0.0 --port 5055</code></pre>
+          <p class="mt-2 text-sm text-muted-foreground">On the other device, open <code>http://YOUR-COMPUTER-IP:5055</code>. Do not expose Flask debug mode to the public internet or an untrusted network.</p>
+        </div>
         {{ alert(message="No npm install is required. Flask Starter already copied the compiled CSS and browser JavaScript into your application.", title="Python is enough") }}
       </section>
     </section>

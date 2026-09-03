@@ -26,12 +26,18 @@ BASECOAT_IMPORT = re.compile(r'{%\s*from\s+"(basecoat/[^"]+)"')
 FILES = {
     "requirements.txt": """flask>=3.0.0
 """,
-    "wsgi.py": """from app import create_app
+    "wsgi.py": """import argparse
+
+from app import create_app
 
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5005)
+    parser = argparse.ArgumentParser(description="Run the Flask development server.")
+    parser.add_argument("--host", default="127.0.0.1", help="Address to listen on. Use 0.0.0.0 for your local network.")
+    parser.add_argument("--port", type=int, required=True, help="Port to listen on, for example 5055.")
+    args = parser.parse_args()
+    app.run(debug=True, host=args.host, port=args.port)
 """,
     "app/__init__.py": """from flask import Flask
 
@@ -217,9 +223,11 @@ def new_app(args: argparse.Namespace) -> None:
     print("  python -m venv .venv")
     print("  source .venv/bin/activate       # Windows: .venv\\Scripts\\activate")
     print("  pip install -r requirements.txt")
-    print("  python wsgi.py")
-    print("\nOpen http://127.0.0.1:5005\n")
-    print("No npm install is required. KD UI copied precompiled browser assets.")
+    print("  python wsgi.py --port 5055")
+    print("\nOpen http://127.0.0.1:5055\n")
+    print("Change 5055 to any available port.")
+    print("For trusted local-network access, add: --host 0.0.0.0")
+    print("No npm install is required.")
 
 
 def copy_component(name: str, target: Path) -> None:

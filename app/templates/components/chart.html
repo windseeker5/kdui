@@ -1,0 +1,62 @@
+{#
+  Lightweight, server-rendered bar chart component.
+
+  Usage:
+    {% from "components/chart.html" import chart %}
+    {{ chart(data=[
+      {"month": "Jan", "sales": 120},
+      {"month": "Feb", "sales": 200},
+      {"month": "Mar", "sales": 150}
+    ], label_key="month", value_key="sales") }}
+
+  Params:
+    data        {list}   List of dictionaries.
+    label_key   {string} Key used for the X-axis labels.
+    value_key   {string} Key used for bar heights.
+    height      {int}    ViewBox height in pixels. Default 160.
+    bar_color   {string} CSS color for bars. Uses var(--chart-1) by default.
+    show_labels {bool}   Render X-axis labels. Default True.
+    class_      {string} Extra classes for the .chart wrapper.
+    attrs       {dict}   Additional attributes for the .chart wrapper.
+#}
+
+{% macro chart(data=[], label_key='label', value_key='value', height=160, bar_color='var(--chart-1)', show_labels=true, class_='', attrs={}) %}
+{% set values = data | map(attribute=value_key) | list %}
+{% set max_value = [values | max, 1] | max if values else 1 %}
+{% set count = data | length %}
+{% set padding = 24 %}
+{% set bottom = 28 if show_labels else 8 %}
+{% set chart_h = height - bottom %}
+{% set gap = 12 %}
+{% set bar_w = (400 - (count + 1) * gap) / count if count > 0 else 0 %}
+<div
+  class="chart {{ class_ }}"
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  <svg viewBox="0 0 400 {{ height }}" preserveAspectRatio="none" class="w-full h-full">
+    {% for row in data %}
+    {% set x = gap + loop.index0 * (bar_w + gap) %}
+    {% set bar_h = (row[value_key] / max_value) * (chart_h - padding) %}
+    {% set y = chart_h - bar_h %}
+    <rect
+      x="{{ x }}"
+      y="{{ y }}"
+      width="{{ bar_w }}"
+      height="{{ bar_h }}"
+      rx="6"
+      fill="{{ bar_color }}"
+    />
+    {% if show_labels %}
+    <text
+      x="{{ x + bar_w / 2 }}"
+      y="{{ height - 10 }}"
+      text-anchor="middle"
+      font-size="12"
+      fill="currentColor"
+      class="text-muted-foreground"
+    >{{ row[label_key] }}</text>
+    {% endif %}
+    {% endfor %}
+  </svg>
+</div>
+{% endmacro %}

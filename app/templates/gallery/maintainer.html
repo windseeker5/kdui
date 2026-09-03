@@ -127,7 +127,7 @@ source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 npm ci
-python wsgi.py</code></pre>
+python wsgi.py --port 5005</code></pre>
         <p class="text-sm text-muted-foreground"><code>npm ci</code> installs the exact locked versions. Its post-install step synchronizes Basecoat and rebuilds the committed CSS. Open <code>http://127.0.0.1:5005/ui/</code>.</p>
       </section>
     </section>
@@ -202,7 +202,7 @@ python scripts/kdui_promote.py component contact_avatar \
       </header>
       <section class="space-y-4">
         <pre class="overflow-x-auto rounded-md bg-muted p-4 text-sm"><code>npm run build:css
-python wsgi.py</code></pre>
+python wsgi.py --port 5005</code></pre>
         <p class="text-sm text-muted-foreground">The CSS rebuild is mandatory after adding or changing Tailwind classes. Flask debug reload does not compile CSS.</p>
         <ul class="grid gap-2 sm:grid-cols-2 text-sm">
           {% for item in [

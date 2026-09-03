@@ -1,0 +1,30 @@
+{#
+  Keyboard key / shortcut component.
+
+  Usage:
+    {% from "components/kbd.html" import kbd, kbd_combo %}
+    {{ kbd("⌘") }} {{ kbd("K") }}
+    {{ kbd_combo(["Ctrl", "B"]) }}
+
+  Params for kbd:
+    key     {string}  The key label.
+    class_  {string}  Extra classes.
+    attrs   {dict}    Additional HTML attributes.
+
+  Params for kbd_combo:
+    keys    {list}    List of key strings. Inserts a "+" between each key.
+    class_  {string}  Extra classes for the wrapper.
+#}
+
+{% macro kbd(key, class_='', attrs={}) %}
+<kbd class="kbd {{ class_ }}" {% for key_name, val in (attrs or {}).items() %}{{ key_name }}="{{ val }}"{% endfor %}>{{ key }}</kbd>
+{% endmacro %}
+
+{% macro kbd_combo(keys=[], class_='') %}
+<span class="inline-flex items-center gap-1 {{ class_ }}">
+  {% for key in keys %}
+    {{ kbd(key) }}
+    {% if not loop.last %}<span>+</span>{% endif %}
+  {% endfor %}
+</span>
+{% endmacro %}
