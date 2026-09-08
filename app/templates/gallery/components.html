@@ -31,6 +31,7 @@
 {% from "components/item.html" import item, item_group %}
 {% from "components/slider.html" import slider %}
 {% from "components/theme_switcher.html" import theme_switcher %}
+{% from "components/command_search.html" import command_search %}
 {% from "basecoat/command.html.jinja" import command %}
 {% from "basecoat/dialog.html.jinja" import dialog %}
 {% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
@@ -39,6 +40,7 @@
 {% from "basecoat/toast.html.jinja" import toaster %}
 
 {% block title %}Components – UI Gallery{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/components/command_search.js') }}" defer></script>{% endblock %}
 {% block breadcrumb %}
   <a href="{{ url_for('gallery.index') }}" class="hover:underline text-muted-foreground">UI Gallery</a>
   <span class="mx-2 text-muted-foreground">/</span>Components
@@ -623,6 +625,25 @@
 {{ slider(id="temperature", label="Temperature", value=50, show_value=true) }}
 ') %}
   <div class="w-full max-w-sm">{{ slider(id="gallery-temperature", label="Temperature", value=50, show_value=true) }}</div>
+{% endcall %}
+
+{# ── Command Search ── #}
+{% call section("Command Search", "Optional reusable command palette for searching links and subsections.", '
+{% from "components/command_search.html" import command_search %}
+{{ command_search(items=[
+  {"type": "group", "label": "Pages", "items": [
+    {"label": "Dashboard", "url": "/app/dashboard"},
+    {"label": "Customers", "url": "/app/customers"}
+  ]}
+], id="my-command-search") }}
+') %}
+  {{ command_search(items=[
+    {"type": "group", "label": "Pages", "items": [
+      {"label": "<span>Dashboard</span>", "url": url_for("dashboard.index"), "keywords": "home overview"},
+      {"label": "<span>Customers</span>", "url": url_for("dashboard.customers"), "keywords": "crm contacts"},
+      {"label": "<span>Settings</span>", "url": url_for("dashboard.settings"), "keywords": "preferences"}
+    ]}
+  ], id="gallery-command-search") }}
 {% endcall %}
 
 {# ── Command ── #}
