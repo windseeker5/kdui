@@ -13,18 +13,20 @@
     description {string}  Optional helper text below the label.
     checked     {bool}    Default False.
     disabled    {bool}    Default False.
+    invalid     {bool}    Adds Basecoat invalid styling and aria-invalid.
     size        {string}  "sm" for a smaller switch.
     class_      {string}  Extra classes for the wrapper.
     attrs       {dict}    Additional attributes for the input.
 #}
 
-{% macro switch(id, name=None, label=None, description=None, checked=False, disabled=False, size=None, class_='', attrs={}) %}
+{% macro switch(id, name=None, label=None, description=None, checked=False, disabled=False, invalid=False, size=None, class_='', attrs={}) %}
 {% set input_name = name or id %}
 <div
   role="group"
   class="field {{ class_ }}"
   data-orientation="horizontal"
-  {% if description %}aria-describedby="{{ id }}-description"{% endif %}
+  {% if disabled %}data-disabled="true"{% endif %}
+  {% if invalid %}data-invalid="true"{% endif %}
 >
   {% if description %}
     <section>
@@ -42,8 +44,10 @@
     class="input"
     {% if checked %}checked{% endif %}
     {% if disabled %}disabled{% endif %}
+    {% if invalid %}aria-invalid="true"{% endif %}
+    {% if description %}aria-describedby="{{ id }}-description"{% endif %}
     {% if size %}data-size="{{ size }}"{% endif %}
-    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+    {% for key, value in (attrs or {}).items() %}{% if value is sameas true %}{{ key }}{% elif value is not sameas false and value is not none %}{{ key }}="{{ value }}"{% endif %} {% endfor %}
   />
 </div>
 {% endmacro %}

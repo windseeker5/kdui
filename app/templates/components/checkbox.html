@@ -12,18 +12,19 @@
     description {string}  Optional helper text below the label.
     checked     {bool}    Default False.
     disabled    {bool}    Default False.
+    invalid     {bool}    Adds Basecoat invalid styling and aria-invalid.
     class_      {string}  Extra classes for the wrapper.
     attrs       {dict}    Additional attributes for the input.
 #}
 
-{% macro checkbox(id, name=None, label=None, description=None, checked=False, disabled=False, class_='', attrs={}) %}
+{% macro checkbox(id, name=None, label=None, description=None, checked=False, disabled=False, invalid=False, class_='', attrs={}) %}
 {% set input_name = name or id %}
-{% if description %}
 <div
   role="group"
   class="field {{ class_ }}"
   data-orientation="horizontal"
-  aria-describedby="{{ id }}-description"
+  {% if disabled %}data-disabled="true"{% endif %}
+  {% if invalid %}data-invalid="true"{% endif %}
 >
   <input
     type="checkbox"
@@ -32,25 +33,17 @@
     class="input"
     {% if checked %}checked{% endif %}
     {% if disabled %}disabled{% endif %}
-    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+    {% if invalid %}aria-invalid="true"{% endif %}
+    {% if description %}aria-describedby="{{ id }}-description"{% endif %}
+    {% for key, value in (attrs or {}).items() %}{% if value is sameas true %}{{ key }}{% elif value is not sameas false and value is not none %}{{ key }}="{{ value }}"{% endif %} {% endfor %}
   />
+  {% if description %}
   <section>
     <label for="{{ id }}">{{ label }}</label>
     <p id="{{ id }}-description">{{ description }}</p>
   </section>
-</div>
-{% else %}
-<div class="flex items-center gap-3 {{ class_ }}">
-  <input
-    type="checkbox"
-    id="{{ id }}"
-    name="{{ input_name }}"
-    class="input"
-    {% if checked %}checked{% endif %}
-    {% if disabled %}disabled{% endif %}
-    {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
-  />
+  {% elif label %}
   <label for="{{ id }}">{{ label }}</label>
+  {% endif %}
 </div>
-{% endif %}
 {% endmacro %}

@@ -18,11 +18,25 @@
 {% from "components/radio.html" import radio_group %}
 {% from "components/textarea.html" import textarea %}
 {% from "components/popover.html" import popover %}
+{% from "components/tooltip.html" import tooltip %}
 {% from "components/drawer.html" import drawer %}
 {% from "components/accordion.html" import accordion %}
 {% from "components/button_group.html" import button_group %}
 {% from "components/alert_dialog.html" import alert_dialog %}
 {% from "components/chart.html" import chart %}
+{% from "components/card.html" import card %}
+{% from "components/button.html" import button %}
+{% from "components/badge.html" import badge %}
+{% from "components/field.html" import field, fieldset %}
+{% from "components/item.html" import item, item_group %}
+{% from "components/slider.html" import slider %}
+{% from "components/theme_switcher.html" import theme_switcher %}
+{% from "basecoat/command.html.jinja" import command %}
+{% from "basecoat/dialog.html.jinja" import dialog %}
+{% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
+{% from "basecoat/select.html.jinja" import select %}
+{% from "basecoat/tabs.html.jinja" import tabs %}
+{% from "basecoat/toast.html.jinja" import toaster %}
 
 {% block title %}Components – UI Gallery{% endblock %}
 {% block breadcrumb %}
@@ -34,7 +48,7 @@
 {{ page_header(title="Components", description="Primitive building blocks. Use them directly in your Jinja templates.") }}
 
 {# ── Helper macro for a preview + usage section ── #}
-{% macro section(title, desc, usage) %}
+{% macro section(title, desc, usage, preview_class='') %}
 <div class="card mb-6">
   <header>
     <h2>{{ title }}</h2>
@@ -42,7 +56,7 @@
   </header>
   <section>
     {# Live preview #}
-    <div class="rounded-lg border bg-muted/30 p-6 mb-4 flex flex-wrap gap-3 items-start">
+    <div class="rounded-lg border bg-muted/30 p-6 mb-4 flex flex-wrap gap-3 items-start {{ preview_class }}">
       {{ caller() }}
     </div>
     {# Usage snippet #}
@@ -149,33 +163,35 @@
 {% endcall %}
 
 {# ── Button ── #}
-{% call section("Button", "Core interactive element. Use data-variant and data-size.", '
-<button type="button" class="btn">Primary</button>
-<button type="button" class="btn" data-variant="secondary">Secondary</button>
-<button type="button" class="btn" data-variant="outline">Outline</button>
-<button type="button" class="btn" data-variant="ghost">Ghost</button>
-<button type="button" class="btn" data-variant="destructive">Destructive</button>
-<button type="button" class="btn" data-size="sm">Small</button>
+{% call section("Button", "Basecoat button with all documented variants and sizes.", '
+{% from "components/button.html" import button %}
+{{ button("Primary") }}
+{{ button("Secondary", variant="secondary") }}
+{{ button("Outline", variant="outline") }}
+{{ button("Ghost", variant="ghost") }}
+{{ button("Destructive", variant="destructive") }}
+{{ button("Small", size="sm") }}
 ') %}
-  <button type="button" class="btn">Primary</button>
-  <button type="button" class="btn" data-variant="secondary">Secondary</button>
-  <button type="button" class="btn" data-variant="outline">Outline</button>
-  <button type="button" class="btn" data-variant="ghost">Ghost</button>
-  <button type="button" class="btn" data-variant="destructive">Destructive</button>
-  <button type="button" class="btn" data-size="sm">Small</button>
+  {{ button("Primary") }}
+  {{ button("Secondary", variant="secondary") }}
+  {{ button("Outline", variant="outline") }}
+  {{ button("Ghost", variant="ghost") }}
+  {{ button("Destructive", variant="destructive") }}
+  {{ button("Small", size="sm") }}
 {% endcall %}
 
 {# ── Badge ── #}
-{% call section("Badge", "Status and label indicator. Variants: default, secondary, destructive, outline.", '
-<span class="badge">Default</span>
-<span class="badge" data-variant="secondary">Secondary</span>
-<span class="badge" data-variant="destructive">Destructive</span>
-<span class="badge" data-variant="outline">Outline</span>
+{% call section("Badge", "Basecoat status and label indicator.", '
+{% from "components/badge.html" import badge %}
+{{ badge("Default") }}
+{{ badge("Secondary", variant="secondary") }}
+{{ badge("Destructive", variant="destructive") }}
+{{ badge("Outline", variant="outline") }}
 ') %}
-  <span class="badge">Default</span>
-  <span class="badge" data-variant="secondary">Secondary</span>
-  <span class="badge" data-variant="destructive">Destructive</span>
-  <span class="badge" data-variant="outline">Outline</span>
+  {{ badge("Default") }}
+  {{ badge("Secondary", variant="secondary") }}
+  {{ badge("Destructive", variant="destructive") }}
+  {{ badge("Outline", variant="outline") }}
 {% endcall %}
 
 {# ── Input ── #}
@@ -192,6 +208,20 @@
   <div class="grid gap-2 w-full max-w-sm">
     <label class="label" for="eg-email">Email</label>
     <input class="input" type="email" id="eg-email" placeholder="you@company.com" />
+  </div>
+{% endcall %}
+
+{# ── Field ── #}
+{% call section("Field", "Accessible Basecoat field and fieldset structure for any form control.", '
+{% from "components/field.html" import field %}
+{% call field(id="company", label="Company", description="Your legal company name.") %}
+  <input id="company" name="company" class="input" placeholder="Acme Inc." />
+{% endcall %}
+') %}
+  <div class="w-full max-w-sm">
+    {% call field(id="gallery-company", label="Company", description="Your legal company name.") %}
+      <input id="gallery-company" name="company" class="input" placeholder="Acme Inc." aria-describedby="gallery-company-description" />
+    {% endcall %}
   </div>
 {% endcall %}
 
@@ -234,16 +264,41 @@
 {% endcall %}
 
 {# ── Card ── #}
-{% call section("Card", "Container with optional header, body, and footer sections.", '
+{% call section("Card", "The standard Basecoat card, including its official radius, spacing, header action, body, and footer.", '
 {% from "components/card.html" import card %}
-{% call card(title="Revenue", description="Last 30 days") %}
-  <p class="text-2xl font-bold">$48,290</p>
+{% call card(
+  title="Login to your account",
+  description="Enter your email below to login to your account",
+  action=\'<button type="button" class="btn" data-variant="link">Sign Up</button>\',
+  footer=\'<button type="button" class="btn w-full">Login</button><button type="button" class="btn w-full" data-variant="outline">Login with Google</button>\',
+  footer_class="flex-col gap-2",
+  class_="w-full max-w-sm"
+) %}
+  <form class="grid gap-6"><!-- email and password fields --></form>
 {% endcall %}
-') %}
-  <div class="card w-full max-w-xs">
-    <header><h2>Revenue</h2><p>Last 30 days</p></header>
-    <section><p class="text-2xl font-bold">$48,290</p></section>
-  </div>
+', preview_class="max-sm:border-0 max-sm:bg-transparent max-sm:p-0") %}
+  {% call card(
+    title="Login to your account",
+    description="Enter your email below to login to your account",
+    action='<button type="button" class="btn" data-variant="link">Sign Up</button>',
+    footer='<button type="button" class="btn w-full">Login</button><button type="button" class="btn w-full" data-variant="outline">Login with Google</button>',
+    footer_class="flex-col gap-2",
+    class_="w-full max-w-sm"
+  ) %}
+    <form class="grid gap-6" onsubmit="return false">
+      <div class="grid gap-2">
+        <label class="label" for="demo-card-email">Email</label>
+        <input class="input" type="email" id="demo-card-email" placeholder="m@example.com" required />
+      </div>
+      <div class="grid gap-2">
+        <div class="flex items-center">
+          <label class="label" for="demo-card-password">Password</label>
+          <a href="#" class="ms-auto inline-block text-sm underline-offset-4 hover:underline">Forgot your password?</a>
+        </div>
+        <input class="input" type="password" id="demo-card-password" required />
+      </div>
+    </form>
+  {% endcall %}
 {% endcall %}
 
 {# ── Stat Card ── #}
@@ -446,6 +501,29 @@
   {% endcall %}
 {% endcall %}
 
+{# ── Tooltip ── #}
+{% call section("Tooltip", "Lightweight hover hint powered by Basecoat’s built-in data-tooltip CSS.", '
+{% from "components/tooltip.html" import tooltip %}
+{% call tooltip(content="Add to library", side="top") %}
+  <button type="button" class="btn" data-size="icon" aria-label="Add to library">
+    <svg class="lucide lucide-plus size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+  </button>
+{% endcall %}
+') %}
+  <div class="flex items-center gap-4">
+    {% call tooltip(content="Add to library", side="top") %}
+      <button type="button" class="btn" data-size="icon" aria-label="Add to library">
+        <svg class="lucide lucide-plus size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
+    {% endcall %}
+    {% call tooltip(content="Delete item", side="right") %}
+      <button type="button" class="btn" data-variant="outline" data-size="icon" aria-label="Delete item">
+        <svg class="lucide lucide-trash-2 size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button>
+    {% endcall %}
+  </div>
+{% endcall %}
+
 {# ── Drawer ── #}
 {% call section("Drawer", "Slide-out panel using the native <dialog> element. Supports all four sides.", '
 {% from "components/drawer.html" import drawer %}
@@ -529,33 +607,101 @@
   </div>
 {% endcall %}
 
-{# ── Theme Switcher ── #}
-{% call section("Theme Switcher", "Toggle light/dark mode. Powered by Basecoat's built-in theme API.", '
-<button
-  type="button"
-  aria-label="Toggle dark mode"
-  onclick="window.basecoat.theme.toggle()"
-  class="btn" data-variant="outline" data-size="icon"
->
-  <span class="hidden dark:block"><!-- sun icon --></span>
-  <span class="block dark:hidden"><!-- moon icon --></span>
-</button>
+{# ── Item ── #}
+{% call section("Item", "Flexible Basecoat content row with media, text, and actions.", '
+{% from "components/item.html" import item %}
+{{ item(title="Basic Item", description="A simple item.", variant="outline") }}
 ') %}
-  <button
-    type="button"
-    aria-label="Toggle dark mode"
-    data-tooltip="Toggle dark mode"
-    data-side="bottom"
-    onclick="window.basecoat.theme.toggle()"
-    class="btn" data-variant="outline" data-size="icon"
-  >
-    <span class="hidden dark:block">
-      <svg class="lucide lucide-sun size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-    </span>
-    <span class="block dark:hidden">
-      <svg class="lucide lucide-moon size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
-    </span>
-  </button>
+  <div class="w-full max-w-md">
+    {{ item(title="Basic Item", description="A simple item with title and description.", variant="outline", action='<button class="btn" data-variant="outline" data-size="sm">Action</button>') }}
+  </div>
+{% endcall %}
+
+{# ── Slider ── #}
+{% call section("Slider", "Basecoat’s native range control with synchronized value output.", '
+{% from "components/slider.html" import slider %}
+{{ slider(id="temperature", label="Temperature", value=50, show_value=true) }}
+') %}
+  <div class="w-full max-w-sm">{{ slider(id="gallery-temperature", label="Temperature", value=50, show_value=true) }}</div>
+{% endcall %}
+
+{# ── Command ── #}
+{% call section("Command", "Searchable command menu using Basecoat’s official Jinja macro.", '
+{% from "basecoat/command.html.jinja" import command %}
+{{ command(id="commands", items=[{"label": "Calendar", "keywords": "date event"}]) }}
+') %}
+  <div class="w-full max-w-sm">
+    {{ command(id="gallery-command", main_attrs={"class": "border"}, items=[
+      {"type": "group", "label": "Suggestions", "items": [
+        {"label": "<span>Calendar</span>", "keywords": "date event schedule"},
+        {"label": "<span>Search Emoji</span>", "keywords": "emoji smile reaction"}
+      ]},
+      {"type": "separator"},
+      {"type": "group", "label": "Settings", "items": [{"label": "<span>Profile</span>"}, {"label": "<span>Billing</span>"}]}
+    ]) }}
+  </div>
+{% endcall %}
+
+{# ── Dialog ── #}
+{% call section("Dialog", "Modal content using Basecoat’s official Jinja macro.", '
+{% from "basecoat/dialog.html.jinja" import dialog %}
+{% call dialog(id="profile-dialog", trigger="Open Dialog", title="Edit profile", trigger_attrs={"class": "btn", "data-variant": "outline"}) %}Profile form{% endcall %}
+') %}
+  {% call dialog(id="gallery-dialog", trigger="Open Dialog", title="Edit profile", description="Make changes to your profile here.", trigger_attrs={"class": "btn", "data-variant": "outline"}) %}
+    <div class="field"><label for="gallery-dialog-name">Name</label><input id="gallery-dialog-name" value="Pedro Duarte" /></div>
+  {% endcall %}
+{% endcall %}
+
+{# ── Dropdown Menu ── #}
+{% call section("Dropdown Menu", "Accessible menu using Basecoat’s official Jinja macro.", '
+{% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
+{{ dropdown_menu(trigger="Open", items=[{"label": "Profile"}, {"type": "separator"}, {"label": "Log out"}], trigger_attrs={"class": "btn"}) }}
+') %}
+  {{ dropdown_menu(id="gallery-dropdown", trigger="Open", items=[
+    {"type": "group", "label": "My Account", "items": [{"label": "Profile"}, {"label": "Billing"}, {"label": "Settings"}]},
+    {"type": "separator"}, {"label": "Log out"}
+  ], trigger_attrs={"class": "btn", "data-variant": "outline"}, popover_attrs={"class": "w-40"}) }}
+{% endcall %}
+
+{# ── Select ── #}
+{% call section("Select", "Custom listbox using Basecoat’s official Jinja macro.", '
+{% from "basecoat/select.html.jinja" import select %}
+{{ select(id="fruit", name="fruit", placeholder="Select a fruit", items=[{"value": "apple", "label": "Apple"}]) }}
+') %}
+  {{ select(id="gallery-select", name="fruit", placeholder="Select a fruit", trigger_attrs={"class": "w-[180px]"}, items=[
+    {"type": "group", "label": "Fruits", "items": [
+      {"value": "apple", "label": "Apple"}, {"value": "banana", "label": "Banana"}, {"value": "blueberry", "label": "Blueberry"}
+    ]}
+  ]) }}
+{% endcall %}
+
+{# ── Tabs ── #}
+{% call section("Tabs", "Keyboard-accessible tabs using Basecoat’s official Jinja macro.", '
+{% from "basecoat/tabs.html.jinja" import tabs %}
+{{ tabs(id="account-tabs", tabsets=[{"tab": "Account", "panel": "Account content."}, {"tab": "Password", "panel": "Password content."}]) }}
+') %}
+  <div class="w-full max-w-sm">
+    {{ tabs(id="gallery-tabs", main_attrs={"class": "w-full"}, tablist_attrs={"class": "w-full"}, tabsets=[
+      {"tab": "Account", "panel": "Account content."}, {"tab": "Password", "panel": "Password content."}
+    ]) }}
+  </div>
+{% endcall %}
+
+{# ── Toast ── #}
+{% call section("Toast", "Transient feedback using Basecoat’s official toaster macro and API.", '
+{% from "basecoat/toast.html.jinja" import toaster %}
+{{ toaster(id="toaster") }}
+') %}
+  <button type="button" class="btn" data-variant="outline" onclick="document.getElementById('toaster').toast({category: 'success', title: 'Success', description: 'Your changes have been saved.', cancel: {label: 'Dismiss'}})">Show toast</button>
+  {{ toaster(id="toaster") }}
+{% endcall %}
+
+{# ── Theme Switcher ── #}
+{% call section("Theme Switcher", "Exact Basecoat light/dark switcher composition.", '
+{% from "components/theme_switcher.html" import theme_switcher %}
+{{ theme_switcher() }}
+') %}
+  {{ theme_switcher() }}
 {% endcall %}
 
 {% endblock %}
