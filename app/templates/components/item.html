@@ -1,0 +1,17 @@
+{# Basecoat Item primitive. #}
+{% macro item(title=None, description=None, icon=None, action=None, href=None, variant=None, size=None, class_='', attrs={}) %}
+{% set tag = 'a' if href else 'article' %}
+<{{ tag }} class="item {{ class_ }}"{% if href %} href="{{ href }}"{% endif %}{% if variant %} data-variant="{{ variant }}"{% endif %}{% if size %} data-size="{{ size }}"{% endif %}{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+  {% if icon %}<figure>{{ icon | safe }}</figure>{% endif %}
+  <section>
+    {% if title %}<h3>{{ title | safe }}</h3>{% endif %}
+    {% if description %}<p>{{ description | safe }}</p>{% endif %}
+    {{ caller() if caller is defined }}
+  </section>
+  {% if action %}<aside>{{ action | safe }}</aside>{% endif %}
+</{{ tag }}>
+{% endmacro %}
+
+{% macro item_group(class_='', attrs={}) %}
+<div class="item-group {{ class_ }}"{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>{{ caller() }}</div>
+{% endmacro %}

@@ -1,0 +1,12 @@
+{# Basecoat Button primitive. #}
+{% macro button(label=None, type='button', variant=None, size=None, href=None, disabled=False, class_='', attrs={}) %}
+{% set tag = 'a' if href else 'button' %}
+<{{ tag }}
+  class="btn {{ class_ }}"
+  {% if href %}href="{{ href }}"{% else %}type="{{ type }}"{% endif %}
+  {% if variant %}data-variant="{{ variant }}"{% endif %}
+  {% if size %}data-size="{{ size }}"{% endif %}
+  {% if disabled %}{% if href %}aria-disabled="true"{% else %}disabled{% endif %}{% endif %}
+  {% for key, value in (attrs or {}).items() %}{% if value is sameas true %}{{ key }}{% elif value is not sameas false and value is not none %}{{ key }}="{{ value }}"{% endif %} {% endfor %}
+>{{ (caller() if caller is defined else label) | safe }}</{{ tag }}>
+{% endmacro %}

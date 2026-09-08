@@ -1,0 +1,16 @@
+{# Basecoat Field and Fieldset primitives. #}
+{% macro field(id=None, label=None, description=None, error=None, orientation=None, disabled=False, class_='', attrs={}) %}
+<div role="group" class="field {{ class_ }}"{% if orientation %} data-orientation="{{ orientation }}"{% endif %}{% if disabled %} data-disabled="true"{% endif %}{% if error %} data-invalid="true"{% endif %}{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+  {% if label %}<label{% if id %} for="{{ id }}"{% endif %}>{{ label }}</label>{% endif %}
+  {{ caller() if caller is defined }}
+  {% if error %}<p role="alert">{{ error }}</p>{% elif description %}<p{% if id %} id="{{ id }}-description"{% endif %}>{{ description }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro fieldset(legend=None, description=None, class_='', attrs={}) %}
+<fieldset class="fieldset {{ class_ }}"{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+  {% if legend %}<legend>{{ legend }}</legend>{% endif %}
+  {% if description %}<p>{{ description }}</p>{% endif %}
+  {{ caller() if caller is defined }}
+</fieldset>
+{% endmacro %}

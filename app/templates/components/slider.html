@@ -1,0 +1,12 @@
+{# Basecoat Slider primitive: a styled native range input. #}
+{% macro slider(id, name=None, value=50, min=0, max=100, step=1, label=None, show_value=False, disabled=False, class_='w-full', attrs={}) %}
+{% if label or show_value %}<div class="grid w-full gap-1">{% endif %}
+  {% if label or show_value %}
+  <div class="flex items-center justify-between gap-2">
+    {% if label %}<label class="label" for="{{ id }}">{{ label }}</label>{% endif %}
+    {% if show_value %}<output class="text-sm text-muted-foreground" for="{{ id }}">{{ value }}</output>{% endif %}
+  </div>
+  {% endif %}
+  <input id="{{ id }}" name="{{ name or id }}" type="range" class="input {{ class_ }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}"{% if disabled %} disabled{% endif %}{% if show_value %} oninput="this.previousElementSibling.querySelector('output').value = this.value"{% endif %}{% for key, attr_value in (attrs or {}).items() %}{% if attr_value is sameas true %} {{ key }}{% elif attr_value is not sameas false and attr_value is not none %} {{ key }}="{{ attr_value }}"{% endif %}{% endfor %} />
+{% if label or show_value %}</div>{% endif %}
+{% endmacro %}
