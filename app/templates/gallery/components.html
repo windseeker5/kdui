@@ -1,11 +1,12 @@
 {% extends "layouts/app.html" %}
 {% from "components/page_header.html" import page_header %}
-{% from "components/stat_card.html"   import stat_card %}
 {% from "components/alert.html"       import alert %}
 {% from "components/empty_state.html" import empty_state %}
 {% from "components/metric_pill.html" import metric_pill %}
 {% from "components/action_menu.html" import action_menu %}
-{% from "components/data_table.html" import data_table, table_cell %}
+{% from "components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
+{% from "components/pagination.html" import pagination %}
+{% from "components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
 {% from "components/file_upload.html" import file_upload %}
 {% from "components/timeline.html" import timeline %}
 {% from "components/avatar.html" import avatar, avatar_group %}
@@ -303,15 +304,37 @@
   {% endcall %}
 {% endcall %}
 
-{# ── Stat Card ── #}
-{% call section("Stat Card", "KPI metric card for dashboards.", '
-{% from "components/stat_card.html" import stat_card %}
-{{ stat_card(label="Revenue", value="$48,290", delta="+12.5%", trend="up") }}
-{{ stat_card(label="Churn",   value="3.4%",    delta="-0.5%",  trend="up") }}
+{# ── KPI Card — Desktop ── #}
+{% call section("KPI Card — Desktop", "Compact stat card with trend badge, period dropdown, and an edge-to-edge sparkline chart.", '
+{% from "components/kpi_card.html" import kpi_card_desktop %}
+{{ kpi_card_desktop(
+     id="kpi-revenue", label="Revenue", value=1248, format="currency",
+     change=12.4, trend_data=[900,940,880,1010,1090,1150,1248], chart_type="area"
+) }}
 ') %}
-  {{ stat_card(label="Total Revenue",    value="$316,550", delta="+18.2% from last month", trend="up") }}
-  {{ stat_card(label="Active Customers", value="8",        delta="+2 this month",           trend="up") }}
-  {{ stat_card(label="Churn Rate",       value="3.4%",     delta="-0.5% vs last month",     trend="up") }}
+  <div class="kdui-kpi-grid w-full">
+    {{ kpi_card_desktop(id="gallery-kpi-revenue", label="Revenue", value=1248, format="currency",
+       change=12.4, trend_data=[900,940,880,1010,1090,1150,1248], chart_type="area") }}
+    {{ kpi_card_desktop(id="gallery-kpi-active", label="Active Customers", value=57,
+       change=-4.0, trend_data=[62,60,58,61,59,58,57], chart_type="bar") }}
+    {{ kpi_card_desktop(id="gallery-kpi-checkins", label="Check-ins", value=41,
+       change=6.0, trend_data=[30,32,35,33,38,40,41], chart_type="bar") }}
+    {{ kpi_card_desktop(id="gallery-kpi-signups", label="Signups", value=12,
+       change=0, trend_data=[10,11,9,12,11,13,12], chart_type="bar") }}
+    {{ kpi_card_desktop(id="gallery-kpi-unpaid", label="Unpaid", value=3,
+       trend_data=[5,4,4,6,3,3,3], chart_type="bar") }}
+  </div>
+{% endcall %}
+
+{# ── KPI Card — Mobile ── #}
+{% call section("KPI Card — Mobile", "Simpler swipeable card: centered value, trend, and period caption. No chart, no dropdown.", '
+{% from "components/kpi_card.html" import kpi_card_mobile %}
+{{ kpi_card_mobile(id="kpi-revenue-m", label="Revenue", value=1248, format="currency", change=12.4) }}
+') %}
+  <div class="kdui-kpi-mobile-scroll max-w-sm w-full">
+    {{ kpi_card_mobile(id="gallery-kpi-revenue-m", label="Revenue", value=1248, format="currency", change=12.4) }}
+    {{ kpi_card_mobile(id="gallery-kpi-unpaid-m", label="Unpaid", value=3, period_label="Last 30 days") }}
+  </div>
 {% endcall %}
 
 {# ── Alert ── #}
@@ -324,43 +347,149 @@
   {{ alert(title="Error", message="Something went wrong. Please try again.", variant="destructive") }}
 {% endcall %}
 
-{# ── Data Table ── #}
-{% call section("Data Table", "Sortable table macro with opt-in responsive records, alignment controls, and action menus.", '
-{% from "components/data_table.html" import data_table, table_cell %}
+{# ── Data Table + Filter Tabs ── #}
+{% call section("Data Table", "Searchable, filterable table toolbar with separate desktop and mobile row views, plus a matching empty state.", '
+{% from "components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
+{% from "components/pagination.html" import pagination %}
 
-{% set columns = [
-  {"key": "date", "label": "Date", "sortable": true, "class_": "w-28"},
-  {"key": "topic", "label": "Topic", "sortable": true},
-  {"key": "_actions", "label": "", "class_": "w-28", "align": "end"}
-] %}
-{% call(row) data_table(columns=columns, rows=records, sort="date", base_url="/records", responsive=true) %}
-  {% call table_cell("Date", numeric=true) %}{{ row.date }}{% endcall %}
-  {% call table_cell("Topic", primary=true, summary=true, summary_title=row.topic, hide_label=true) %}{{ row.topic }}{% endcall %}
-  {% call table_cell("Actions", action=true, class_="text-end") %}<a href="/records/{{ row.id }}" class="btn" data-variant="outline" data-size="sm">View</a>{% endcall %}
-{% endcall %}
+<form method="get" action="/records" class="contents">
+  {{ preserve_filters(current_filters) }}
+  <div class="card kdui-data-table">
+    <header>
+      {{ table_toolbar(
+           id="records-toolbar",
+           tabs=[
+             {"label": "Active", "url": "?status=active", "count": 5, "active": true},
+             {"label": "Archived", "url": "?status=archived", "count": 2},
+             {"label": "All", "url": "?status=all"}
+           ],
+           search_value=q,
+           search_placeholder="Search records…"
+      ) }}
+    </header>
+    {% if rows %}
+      <div class="kdui-data-table__desktop">{{ table_desktop(id="records-table", rows=rows, columns=columns) }}</div>
+      <div class="kdui-data-table__mobile">{{ table_mobile(id="records-list", rows=rows) }}</div>
+      {{ pagination(page=page, total_pages=total_pages, base_url="/records", extra_params=current_filters) }}
+    {% else %}
+      {{ table_empty_state(icon="search", title="No records found", description="Try adjusting your search or filters.") }}
+    {% endif %}
+  </div>
+</form>
 ') %}
   {% set demo_columns = [
-    {"key": "date",     "label": "Date",    "sortable": true,  "class_": "w-28"},
-    {"key": "type",     "label": "Type",    "sortable": false, "class_": "w-24"},
-    {"key": "contact",  "label": "Contact", "sortable": true,  "class_": "w-36"},
-    {"key": "topic",    "label": "Topic",   "sortable": true},
-    {"key": "_actions", "label": "",        "sortable": false, "align": "end", "class_": "w-28"}
+    {"label": "Date", "class_": "w-28"},
+    {"label": "Type", "class_": "w-24"},
+    {"label": "Contact", "class_": "w-36"},
+    {"label": "Topic", "class_": "w-auto"}
   ] %}
   {% set demo_rows = [
-    {"id": 1, "date": "2026-08-14", "type": "Call", "contact": "Sabrina Martin", "topic": "Validation with the notary regarding the estate inventory and successor documentation."},
-    {"id": 2, "date": "2026-08-10", "type": "Meeting", "contact": "Andrey Pelletier", "topic": "Review sale offers before distributing the remaining estate assets."}
+    {
+      "id": 1,
+      "avatar_name": "Sabrina Martin",
+      "primary": "Sabrina Martin",
+      "secondary": "sabrina.martin@example.com",
+      "cells": [
+        '<span class="text-muted-foreground">2026-08-14</span>',
+        '<span class="badge" data-variant="outline">Call</span>',
+        'Customer since 2024',
+        '<span class="truncate block max-w-xs" title="Validation with the notary">Validation with the notary…</span>'
+      ],
+      "badges": [{"text": "Premium", "variant": "secondary"}],
+      "actions": [
+        {"label": "View"},
+        {"label": "Edit"},
+        {"type": "separator"},
+        {"label": "Delete", "attrs": {"class": "text-destructive"}}
+      ]
+    },
+    {
+      "id": 2,
+      "avatar_name": "Andrey Pelletier",
+      "primary": "Andrey Pelletier",
+      "secondary": "andrey.pelletier@example.com",
+      "cells": [
+        '<span class="text-muted-foreground">2026-08-10</span>',
+        '<span class="badge" data-variant="outline">Meeting</span>',
+        'Customer since 2023',
+        '<span class="truncate block max-w-xs" title="Review sale offers">Review sale offers…</span>'
+      ],
+      "badges": [{"text": "Starter", "variant": "secondary"}],
+      "actions": [
+        {"label": "View"},
+        {"label": "Edit"},
+        {"type": "separator"},
+        {"label": "Delete", "attrs": {"class": "text-destructive"}}
+      ]
+    },
+    {
+      "id": 3,
+      "avatar_name": "Initech",
+      "primary": "Initech Inc.",
+      "secondary": "billing@initech.com",
+      "cells": [
+        '<span class="text-muted-foreground">2026-08-05</span>',
+        '<span class="badge" data-variant="outline">Email</span>',
+        'Customer since 2022',
+        '<span class="truncate block max-w-xs" title="Invoice follow-up">Invoice follow-up…</span>'
+      ],
+      "badges": [{"text": "Enterprise", "variant": "outline"}],
+      "actions": [
+        {"label": "View"},
+        {"label": "Edit"},
+        {"type": "separator"},
+        {"label": "Delete", "attrs": {"class": "text-destructive"}}
+      ]
+    }
   ] %}
-  {% set demo_sort = request.args.get("sort", "date") if request.args.get("sort", "date") in ("date", "contact", "topic") else "date" %}
-  {% set demo_order = "desc" if request.args.get("order") == "desc" else "asc" %}
-  {% set demo_rows = demo_rows | sort(attribute=demo_sort, reverse=(demo_order == "desc")) %}
+  {% set demo_q = request.args.get("q", "") %}
+  {% set demo_rows_filtered = demo_rows | selectattr("primary") | list %}
+  {% if demo_q %}
+    {% set demo_q_lower = demo_q | lower %}
+    {% set demo_rows_filtered = demo_rows_filtered | selectattr("primary") | list %}
+  {% endif %}
   <div class="w-full">
-    {% call(row) data_table(columns=demo_columns, rows=demo_rows, sort=demo_sort, order=demo_order, base_url=url_for("gallery.components"), responsive=true) %}
-      {% call table_cell("Date", numeric=true, class_="text-muted-foreground") %}{{ row.date }}{% endcall %}
-      {% call table_cell("Type") %}<span class="badge" data-variant="outline">{{ row.type }}</span>{% endcall %}
-      {% call table_cell("Contact", secondary=true) %}{{ row.contact }}{% endcall %}
-      {% call table_cell("Topic", primary=true, summary=true, summary_title=row.topic, hide_label=true) %}{{ row.topic }}{% endcall %}
-      {% call table_cell("Actions", action=true, class_="text-end") %}{{ action_menu(id="gallery-record-actions-" ~ row.id, items=[{"label": "View", "url": "/records/" ~ row.id}, {"label": "Edit", "url": "/records/" ~ row.id ~ "/edit"}]) }}{% endcall %}
-    {% endcall %}
+    <div class="card kdui-data-table">
+      <header>
+        {{ table_toolbar(
+             id="gallery-table-toolbar",
+             tabs=[
+               {"label": "Active", "url": "#", "count": 3, "active": true},
+               {"label": "Archived", "url": "#", "count": 8},
+               {"label": "All", "url": "#", "count": 11}
+             ],
+             search_value=demo_q,
+             search_placeholder="Search records…"
+        ) }}
+      </header>
+      <div class="kdui-data-table__desktop">
+        {{ table_desktop(id="gallery-records-table", rows=demo_rows_filtered, columns=demo_columns, item_name="Customer") }}
+      </div>
+      <div class="kdui-data-table__mobile">
+        {{ table_mobile(id="gallery-records-list", rows=demo_rows_filtered) }}
+      </div>
+    </div>
+    {{ pagination(page=1, total_pages=5, base_url="#") }}
+  </div>
+  <div class="w-full max-w-sm">
+    <div class="text-sm text-muted-foreground mb-2">Mobile-only card list, same component</div>
+    <div class="card kdui-data-table">
+      <header>
+        {{ table_toolbar(
+             id="gallery-table-toolbar-mobile",
+             tabs=[
+               {"label": "Active", "url": "#", "count": 3, "active": true},
+               {"label": "Archived", "url": "#", "count": 8},
+               {"label": "All", "url": "#", "count": 11}
+             ],
+             search_value="",
+             search_placeholder="Search records…"
+        ) }}
+      </header>
+      <div class="kdui-data-table__mobile">
+        {{ table_mobile(id="gallery-mobile-only-list", rows=demo_rows_filtered) }}
+      </div>
+    </div>
   </div>
 {% endcall %}
 

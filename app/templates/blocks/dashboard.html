@@ -1,5 +1,5 @@
 {% extends "layouts/app.html" %}
-{% from "components/stat_card.html" import stat_card %}
+{% from "components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
 {% from "components/page_header.html" import page_header %}
 
 {% block title %}Dashboard – Flask Starter{% endblock %}
@@ -9,11 +9,35 @@
 
 {{ page_header(title="Dashboard", description="Welcome back. Here's what's happening.") }}
 
-{# ── KPI Stat Grid ── #}
-<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+{# ── KPI Stat Grid — Desktop ── #}
+<div class="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
   {% for stat in stats %}
-    {{ stat_card(label=stat.label, value=stat.value, delta=stat.delta, trend=stat.trend) }}
+    {{ kpi_card_desktop(
+         id="kpi-" ~ stat.label | lower | replace(" ", "-") | replace(".", "") | replace("/", "-") | trim,
+         label=stat.label,
+         value=stat.value,
+         change=stat.change,
+         format=("currency" if "Revenue" in stat.label else "number"),
+         trend_data=stat.trend_data | default([]),
+         chart_type=("area" if loop.first else "bar")
+    ) }}
   {% endfor %}
+</div>
+
+{# ── KPI Stat Grid — Mobile (swipeable) ── #}
+<div class="sm:hidden mb-6">
+  <div class="kdui-kpi-mobile-scroll">
+    {% for stat in stats %}
+      {{ kpi_card_mobile(
+           id="kpi-" ~ stat.label | lower | replace(" ", "-") | replace(".", "") | replace("/", "-") | trim ~ "-m",
+           label=stat.label,
+           value=stat.value,
+           change=stat.change,
+           format=("currency" if "Revenue" in stat.label else "number"),
+           period_label="Last 30 days"
+      ) }}
+    {% endfor %}
+  </div>
 </div>
 
 {# ── Bottom two columns ── #}
