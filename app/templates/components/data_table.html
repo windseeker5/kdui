@@ -118,15 +118,8 @@
 {% endmacro %}
 
 {% macro _render_avatar(row) %}
-{% set alt = row.primary | default(row.avatar_name | default('')) %}
-{% set safe_name = row.avatar_name | default(row.primary | default('?')) | trim %}
-{% set words = safe_name.split() %}
-{% set fallback = ((words[0][0] if words else '?') ~ (words[1][0] if words | length > 1 else '')) | upper %}
-{% if row.avatar_url %}
-  {{ avatar(src=row.avatar_url, alt=alt, fallback=fallback, size="sm") }}
-{% else %}
-  {{ avatar(fallback=fallback, size="sm") }}
-{% endif %}
+{% set name = row.avatar_name | default(row.primary | default('?')) %}
+{{ avatar(src=row.avatar_url | default(None), alt=name, size="sm") }}
 {% endmacro %}
 
 {% macro _render_badges(badge_list) %}

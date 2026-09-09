@@ -276,6 +276,14 @@
   background-color: color-mix(in oklab, var(--foreground) 1.5%, transparent) !important;
 }
 
+.kdui-data-table__desktop .table :is(th, td):first-child {
+  padding-left: 1.5rem;
+}
+
+.kdui-data-table__desktop .table :is(th, td):last-child {
+  padding-right: 1.5rem;
+}
+
 .kdui-data-table__desktop,
 .kdui-data-table__mobile {
   padding: 0;
