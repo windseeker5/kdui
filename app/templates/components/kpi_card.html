@@ -1,0 +1,166 @@
+{#
+  KPI Card — desktop and mobile variants.
+
+  kpi_card_desktop(): compact stat card with label, value, trend badge,
+  optional period dropdown, and a dependency-free edge-to-edge SVG
+  sparkline chart.
+
+  kpi_card_mobile(): a distinct, simpler card for small/swipeable layouts
+  — centered label/value/trend and a static period caption. No dropdown,
+  no chart.
+
+  Usage:
+    {% from "components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
+    {{ kpi_card_desktop(
+         id="kpi-revenue",
+         label="Revenue",
+         value=1248,
+         format="currency",
+         change=12.4,
+         trend_data=[900, 940, 880, 1010, 1090, 1150, 1248],
+         chart_type="area"
+       ) }}
+    {{ kpi_card_mobile(
+         id="kpi-revenue-m",
+         label="Revenue",
+         value=1248,
+         format="currency",
+         change=12.4,
+         period_label="Last 7 days"
+       ) }}
+
+  Parameters for kpi_card_desktop:
+    - id (str): unique id; required. Used to derive child ids.
+    - label (str): eyebrow label.
+    - value (int/float): current numeric value.
+    - format (str): "number" (default) | "currency".
+    - change (float): percent change vs previous period, or None to omit.
+    - trend_data (list): oldest -> newest numbers, or None/[] to omit chart.
+    - chart_type (str): "area" | "bar".
+    - period (str): selected period code. Default "7d".
+    - periods (list): available period codes; None/[] omits dropdown.
+    - size (str): "default" | "compact".
+    - attrs (dict): extra attributes on the outer element.
+
+  Parameters for kpi_card_mobile:
+    - id, label, value, format, change: same as above.
+    - period_label (str): static caption. Default "Last 7 days".
+    - attrs (dict): extra attributes on the outer element.
+#}
+
+{% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
+
+{% set _kpi_period_labels = {
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "90d": "Last 90 days",
+  "fy": "Fiscal year",
+  "all": "All time"
+} %}
+{% set _kpi_period_short_labels = {
+  "7d": "7D",
+  "30d": "30D",
+  "90d": "90D",
+  "fy": "FY",
+  "all": "All"
+} %}
+
+{% macro _kpi_trend(change) %}
+{% if change is not none %}
+  <span class="kdui-kpi-card__trend {{ 'is-up' if change > 0 else ('is-down' if change < 0 else 'is-flat') }}">
+    {% set abs_change = change | abs %}{{ "{:.1f}".format(abs_change) if abs_change < 1 and abs_change != 0 else "{:.0f}".format(abs_change) }}%
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      {% if change > 0 %}
+        <path d="M3 17 9 11 13 15 21 7"/><path d="M15 7h6v6"/>
+      {% elif change < 0 %}
+        <path d="M3 7 9 13 13 9 21 17"/><path d="M15 17h6v-6"/>
+      {% else %}
+        <path d="M4 12h16"/>
+      {% endif %}
+    </svg>
+  </span>
+{% else %}
+  <span class="kdui-kpi-card__trend is-flat" style="visibility: hidden;">&nbsp;</span>
+{% endif %}
+{% endmacro %}
+
+{% macro _kpi_chart(trend_data, chart_type="area") %}
+{% set values = trend_data | list %}
+{% set count = values | length %}
+{% set max_value = values | max if values else 1 %}
+{% set min_value = values | min if values else 0 %}
+{% set spread = max_value - min_value %}
+<svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Metric trend">
+  {% if chart_type == "bar" %}
+    {% set gap = 2 %}
+    {% set bar_width = (100 - (count + 1) * gap) / count if count else 0 %}
+    {% for v in values %}
+      {% set bar_height = 4 + ((v / max_value) * 31 if max_value else 0) %}
+      <rect class="kdui-kpi-chart__bar" x="{{ gap + loop.index0 * (bar_width + gap) }}" y="{{ 40 - bar_height }}" width="{{ bar_width }}" height="{{ bar_height }}" rx="1.5" />
+    {% endfor %}
+  {% else %}
+    {% set points = namespace(value='') %}
+    {% for v in values %}
+      {% set x = (loop.index0 / (count - 1) * 100) if count > 1 else 50 %}
+      {% set y = 4 + (((max_value - v) / spread) * 31 if spread else 15.5) %}
+      {% set points.value = points.value ~ ('' if loop.first else ' ') ~ x ~ ',' ~ y %}
+    {% endfor %}
+    <polygon class="kdui-kpi-chart__area" points="0,40 {{ points.value }} 100,40" />
+    <polyline class="kdui-kpi-chart__line" points="{{ points.value }}" />
+  {% endif %}
+</svg>
+{% endmacro %}
+
+{% macro kpi_card_desktop(id, label, value, format="number", change=None, trend_data=None, chart_type="area", period="7d", periods=["7d", "30d", "90d", "all"], size="default", attrs={}) %}
+<div id="{{ id }}" class="kdui-kpi-card"
+  {% if size != "default" %}data-size="{{ size }}"{% endif %}
+  data-kpi-format="{{ format }}"
+  data-kpi-chart-type="{{ chart_type }}"
+  data-kpi-period="{{ period }}"
+  {% for k, v in (attrs or {}).items() %}{% if v is sameas true %} {{ k }}{% elif v is not sameas false and v is not none %} {{ k }}="{{ v }}"{% endif %}{% endfor %}>
+  <div class="kdui-kpi-card__top">
+    <div class="kdui-kpi-card__row">
+      <div class="kdui-kpi-card__label">{{ label }}</div>
+      {% if periods %}
+        {% set period_trigger %}<span id="{{ id }}-period-label">{{ _kpi_period_short_labels.get(period, period) }}</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>{% endset %}
+        {% call dropdown_menu(
+             id=id ~ "-period",
+             trigger=period_trigger,
+             trigger_attrs={"class": "kdui-kpi-card__period-trigger"},
+             popover_attrs={"data-align": "end"},
+             main_attrs={"class": "kdui-kpi-card__period"}
+           ) %}
+          {% for p in periods %}
+            <div role="menuitem" data-period-value="{{ p }}"{% if p == period %} class="active"{% endif %}>
+              {{ _kpi_period_labels.get(p, p) }}
+            </div>
+          {% endfor %}
+        {% endcall %}
+      {% endif %}
+    </div>
+    <div class="kdui-kpi-card__value" id="{{ id }}-value">
+      {% set formatted = "{:,.0f}".format(value) if (value | int == value) else "{:,.1f}".format(value) %}
+      {% if format == "currency" %}${% endif %}{{ formatted }}
+    </div>
+    {{ _kpi_trend(change) }}
+  </div>
+  {% if trend_data %}
+    <div class="kdui-kpi-card__chart" id="{{ id }}-chart">
+      {{ _kpi_chart(trend_data, chart_type) }}
+    </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro kpi_card_mobile(id, label, value, format="number", change=None, period_label="Last 7 days", attrs={}) %}
+<div id="{{ id }}" class="kdui-kpi-card-mobile"
+  {% for k, v in (attrs or {}).items() %}{% if v is sameas true %} {{ k }}{% elif v is not sameas false and v is not none %} {{ k }}="{{ v }}"{% endif %}{% endfor %}>
+  <div class="kdui-kpi-card-mobile__label">{{ label }}</div>
+  <div class="kdui-kpi-card-mobile__value">
+    {% set formatted_m = "{:,.0f}".format(value) if (value | int == value) else "{:,.1f}".format(value) %}
+    {% if format == "currency" %}${% endif %}{{ formatted_m }}
+  </div>
+  {{ _kpi_trend(change) }}
+  <div class="kdui-kpi-card-mobile__period">{{ period_label }}</div>
+</div>
+{% endmacro %}

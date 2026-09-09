@@ -24,8 +24,8 @@ RECENT_ACTIVITY = [
 ]
 
 STATS = [
-    {"label": "Total Revenue",    "value": "$316,550", "delta": "+18.2% from last month", "trend": "up"},
-    {"label": "Active Customers", "value": "8",        "delta": "+2 this month",           "trend": "up"},
-    {"label": "Churn Rate",       "value": "3.4%",     "delta": "-0.5% vs last month",     "trend": "up"},
-    {"label": "Avg. Revenue / Customer", "value": "$39,569", "delta": "+$4,200 vs last month", "trend": "up"},
+    {"label": "Total Revenue",    "value": 316550, "change": 18.2, "trend_data": [210000, 235000, 260000, 270000, 290000, 305000, 316550]},
+    {"label": "Active Customers", "value": 8,      "change": 2.0,  "trend_data": [5, 5, 6, 6, 7, 7, 8]},
+    {"label": "Churn Rate",       "value": 3.4,    "change": -0.5, "trend_data": [4.5, 4.2, 4.0, 3.8, 3.6, 3.5, 3.4]},
+    {"label": "Avg. Revenue / Customer", "value": 39569, "change": 4.2, "trend_data": [31000, 33000, 35000, 36000, 37000, 38500, 39569]},
 ]

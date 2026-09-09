@@ -1,7 +1,6 @@
 {% extends "layouts/app.html" %}
 {% from "components/page_header.html"   import page_header %}
-{% from "components/search_filter.html" import search_filter %}
-{% from "components/data_table.html"    import data_table %}
+{% from "components/data_table.html"    import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
 {% from "components/pagination.html"    import pagination %}
 
 {% block title %}Projects - App{% endblock %}
@@ -17,41 +16,82 @@
 Add project</a>'
 ) }}
 
-{{ search_filter(
-  action=url_for("project.list_project"),
-  q=q,
-  filters=[
-    {
-      "name": "status",
-      "options": [("", "All"), ("active", "Active"), ("inactive", "Inactive")],
-      "value": status
-    }
-  ],
-  show_submit=true
-) }}
+{% set current_filters = {} %}
+{% if q %}{% set _ = current_filters.update({"q": q}) %}{% endif %}
+{% if status %}{% set _ = current_filters.update({"status": status}) %}{% endif %}
+{% if sort %}{% set _ = current_filters.update({"sort": sort}) %}{% endif %}
+{% if order %}{% set _ = current_filters.update({"order": order}) %}{% endif %}
+
+{% set tabs = [
+  {"label": "Active",   "url": url_for("project.list_project", q=q, status="active", sort=sort, order=order), "active": status == "active"},
+  {"label": "Inactive", "url": url_for("project.list_project", q=q, status="inactive", sort=sort, order=order), "active": status == "inactive"},
+  {"label": "All",      "url": url_for("project.list_project", q=q, sort=sort, order=order), "active": not status}
+] %}
+
+{% set columns = [
+  {"label": "Owner", "class_": "w-36"},
+  {"label": "Status","class_": "w-28 text-center"},
+  {"label": "Due",   "class_": "w-28 text-end"}
+] %}
+
+{% set rows = [] %}
+{% for p in project_list %}
+  {% set actions = [
+    {"label": "View", "url": url_for('project.detail_project', item_id=p.id)},
+    {"label": "Edit", "url": url_for('project.edit_project', item_id=p.id)},
+    {"type": "separator"},
+    {"label": "Delete", "attrs": {"class": "text-destructive"}}
+  ] %}
+  {% set cells = [
+    p.owner,
+    '<span class="flex justify-center"><span class="badge" data-variant="' ~ ("secondary" if p.status == "Inactive" else "outline") ~ '">' ~ p.status ~ '</span></span>',
+    '<span class="text-end block">' ~ p.due ~ '</span>'
+  ] %}
+  {% set mobile_status_badge = [{"text": p.status, "variant": ("secondary" if p.status == "Inactive" else "outline")}] %}
+  {% set row = {
+       "id": p.id,
+       "avatar_name": p.name,
+       "primary": p.name,
+       "secondary": p.owner,
+       "cells": cells,
+       "mobile_badges": mobile_status_badge,
+       "actions": actions
+     } %}
+  {% set _ = rows.append(row) %}
+{% endfor %}
 
 <p class="text-sm text-muted-foreground mb-3">{{ total }} record{{ "s" if total != 1 else "" }}</p>
 
-{% set columns = [
-  {"key": "name", "label": "Name", "sortable": true},
-  {"key": "owner", "label": "Owner", "sortable": true},
-  {"key": "status", "label": "Status", "sortable": false},
-  {"key": "due", "label": "Due", "sortable": true},
-  {"key": "_actions", "label": "", "sortable": false}
-] %}
+<form method="get" action="{{ url_for("project.list_project") }}" class="contents">
+  {{ preserve_filters(current_filters) }}
+  <div class="card kdui-data-table mb-6">
+    <header>
+      {{ table_toolbar(
+           id="projects-toolbar",
+           tabs=tabs,
+           search_value=q,
+           search_placeholder="Search projects…"
+      ) }}
+    </header>
 
-{% call(row) data_table(columns=columns, rows=project_list, sort=sort, order=order, base_url=url_for("project.list_project")) %}
-  <td>{{ row.name }}</td>
-  <td>{{ row.owner }}</td>
-  <td><span class="badge" data-variant="{{ 'secondary' if row.status == 'Inactive' else 'outline' }}">{{ row.status }}</span></td>
-  <td>{{ row.due }}</td>
-  <td class="text-end">
-    <div class="inline-flex gap-1">
-      <a href="{{ url_for('project.detail_project', item_id=row.id) }}" class="btn" data-variant="ghost" data-size="sm">View</a>
-      <a href="{{ url_for('project.edit_project',   item_id=row.id) }}" class="btn" data-variant="ghost" data-size="sm">Edit</a>
-    </div>
-  </td>
-{% endcall %}
+    {% if rows %}
+      <div class="kdui-data-table__desktop">
+        {{ table_desktop(id="projects-table", rows=rows, columns=columns, item_name="Project") }}
+      </div>
+      <div class="kdui-data-table__mobile">
+        {{ table_mobile(id="projects-list", rows=rows) }}
+      </div>
+    {% else %}
+      {{ table_empty_state(
+           icon="search",
+           title="No projects match your filters",
+           description="Try adjusting your search or filter criteria.",
+           action_url=url_for("project.list_project"),
+           action_label="Clear all filters"
+      ) }}
+    {% endif %}
+  </div>
+</form>
 
 {{ pagination(
   page=page,

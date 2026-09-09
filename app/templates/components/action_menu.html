@@ -29,13 +29,16 @@
                   (right-aligned), since this is almost always the last
                   column in a table and should never overflow past the
                   right edge of the viewport.
+    icon_only     {bool}   Use a compact three-dot trigger. Default false.
 #}
 {% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
-{% macro action_menu(id, items, label="Action", align="end") %}
+{% macro action_menu(id, items, label="Action", align="end", icon_only=false) %}
+{% set text_trigger %}<span>{{ label }}</span><span class="w-px h-4 bg-border mx-1"></span><svg class="lucide lucide-chevron-down size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>{% endset %}
+{% set icon_trigger %}<svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg>{% endset %}
 {{ dropdown_menu(
   id=id,
-  trigger='<span>' ~ label ~ '</span><span class="w-px h-4 bg-border mx-1"></span><svg class="lucide lucide-chevron-down size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-  trigger_attrs={"class": "btn", "data-variant": "outline", "data-size": "sm"},
+  trigger=icon_trigger if icon_only else text_trigger,
+  trigger_attrs={"class": "btn", "data-variant": "outline", "data-size": ("icon-sm" if icon_only else "sm"), "aria-label": ("Actions" if icon_only else label)},
   popover_attrs={"data-align": align},
   items=items
 ) }}

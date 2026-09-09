@@ -21,6 +21,7 @@ KDUI_ROOT = Path(__file__).resolve().parents[1]
 APP_SOURCE = KDUI_ROOT / "app"
 SAFE_NAME = re.compile(r"^[a-z0-9_]+$")
 BASECOAT_IMPORT = re.compile(r'{%\s*from\s+"(basecoat/[^"]+)"')
+COMPONENT_IMPORT = re.compile(r'{%\s*from\s+"components/([a-z0-9_]+)\.html"')
 
 
 FILES = {
@@ -230,9 +231,14 @@ def new_app(args: argparse.Namespace) -> None:
     print("No npm install is required.")
 
 
-def copy_component(name: str, target: Path) -> None:
+def copy_component(name: str, target: Path, seen: set[str] | None = None) -> None:
     if not SAFE_NAME.fullmatch(name):
         raise SystemExit("Component names use lowercase letters, numbers, and underscores only.")
+
+    seen = seen if seen is not None else set()
+    if name in seen:
+        return
+    seen.add(name)
 
     source = APP_SOURCE / "templates" / "components" / f"{name}.html"
     if not source.is_file():
@@ -245,6 +251,9 @@ def copy_component(name: str, target: Path) -> None:
     for basecoat_template in sorted(set(BASECOAT_IMPORT.findall(content))):
         dependency = APP_SOURCE / "templates" / basecoat_template
         copy_file(dependency, target / "app" / "templates" / basecoat_template, f"app/templates/{basecoat_template}")
+
+    for component_name in sorted(set(COMPONENT_IMPORT.findall(content))):
+        copy_component(component_name, target, seen)
 
     controller = APP_SOURCE / "static" / "js" / "components" / f"{name}.js"
     if controller.is_file():
