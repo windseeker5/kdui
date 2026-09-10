@@ -1,11 +1,9 @@
 <!doctype html>
 <html lang="en" class="{% block html_class %}{% endblock %}">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Flask Shadcn Starter{% endblock %}</title>
-
-  <!-- Prevent theme flash: apply saved theme before first paint (Basecoat convention) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}KD UI{% endblock %}</title>
   <script>
     (() => {
       try {
@@ -16,21 +14,17 @@
       } catch (_) {}
     })();
   </script>
-
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/kdui.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('kdui.static', filename='kdui/css/output.css') }}">
+  <link rel="stylesheet" href="{{ url_for('kdui.static', filename='kdui/css/kdui.css') }}">
   {% block head %}{% endblock %}
 </head>
-<body class="bg-background text-foreground min-h-screen">
+<body class="min-h-screen bg-background text-foreground">
   {% block body %}{% endblock %}
-
-  {% block vendor_scripts %}
-    <script src="{{ url_for('static', filename='js/vendor/basecoat.all.min.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/components/file_upload.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/components/data_table.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/components/kpi_card.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
-  {% endblock %}
+  <script src="{{ url_for('kdui.static', filename='kdui/js/vendor/basecoat.all.min.js') }}" defer></script>
+  <script src="{{ url_for('kdui.static', filename='kdui/js/components/command_search.js') }}" defer></script>
+  <script src="{{ url_for('kdui.static', filename='kdui/js/components/file_upload.js') }}" defer></script>
+  <script src="{{ url_for('kdui.static', filename='kdui/js/components/data_table.js') }}" defer></script>
+  <script src="{{ url_for('kdui.static', filename='kdui/js/components/kpi_card.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,50 @@
+{#
+  Reusable create/edit form composition.
+
+  Usage:
+    {% from "kdui/patterns/form_page.html" import form_page %}
+    {% call form_page(
+      title="New project",
+      description="Add the project details.",
+      card_title="Project details",
+      action=url_for("projects.create"),
+      cancel_url=url_for("projects.index"),
+      submit_label="Create project"
+    ) %}
+      <!-- fields -->
+    {% endcall %}
+#}
+{% macro form_page(title, card_title, action, cancel_url, submit_label="Save changes", description=None, card_description=None, method="post", form_id="resource-form", errors=[], class_="max-w-2xl", attrs={}) %}
+<div class="{{ class_ }}"{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold tracking-tight">{{ title }}</h1>
+    {% if description %}<p class="mt-1 text-sm text-muted-foreground">{{ description }}</p>{% endif %}
+  </div>
+
+  {% if errors %}
+    <div class="alert mb-4" data-variant="destructive" role="alert">
+      <svg class="lucide lucide-circle-alert" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <h2>Check the form</h2>
+      <section>
+        <ul class="list-disc pl-5">
+          {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+      </section>
+    </div>
+  {% endif %}
+
+  <form id="{{ form_id }}" method="{{ method }}" action="{{ action }}" class="card">
+    <header>
+      <h2>{{ card_title }}</h2>
+      {% if card_description %}<p>{{ card_description }}</p>{% endif %}
+    </header>
+    <section class="grid gap-5">
+      {{ caller() }}
+    </section>
+    <footer class="justify-end gap-2">
+      <a href="{{ cancel_url }}" class="btn" data-variant="ghost">Cancel</a>
+      <button type="submit" class="btn">{{ submit_label }}</button>
+    </footer>
+  </form>
+</div>
+{% endmacro %}

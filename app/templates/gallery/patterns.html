@@ -1,0 +1,61 @@
+{% extends "layouts/app.html" %}
+{% from "kdui/components/page_header.html" import page_header %}
+{% from "kdui/components/field.html" import field %}
+{% from "kdui/patterns/form_page.html" import form_page %}
+
+{% block title %}Patterns · KD UI{% endblock %}
+{% block content %}
+{{ page_header(title="Patterns", description="Reusable compositions built from KD UI components. Patterns contain no business-specific routes or data.") }}
+
+<section class="space-y-4" id="form-page">
+  <div>
+    <h2 class="text-lg font-semibold">Form page</h2>
+    <p class="text-sm text-muted-foreground">A complete create or edit form with heading, card, validation summary, and actions.</p>
+  </div>
+
+  <div class="rounded-xl border bg-muted/20 p-4 md:p-6">
+    {% call form_page(
+      title="New project",
+      description="Add the details for your project.",
+      card_title="Project details",
+      card_description="Fields marked with an asterisk are required.",
+      action=url_for('gallery.patterns'),
+      method="get",
+      cancel_url=url_for('gallery.patterns'),
+      submit_label="Create project"
+    ) %}
+      {% call field(id="project-name", label="Project name *", description="Use a short, recognizable name.") %}
+        <input class="input" id="project-name" name="name" placeholder="Website redesign" required>
+      {% endcall %}
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% call field(id="project-owner", label="Owner") %}
+          <input class="input" id="project-owner" name="owner" placeholder="Alex Morgan">
+        {% endcall %}
+        {% call field(id="project-date", label="Due date") %}
+          <input class="input" id="project-date" name="due_date" type="date">
+        {% endcall %}
+      </div>
+      {% call field(id="project-notes", label="Notes") %}
+        <textarea class="input min-h-24" id="project-notes" name="notes" placeholder="Optional context for the team"></textarea>
+      {% endcall %}
+    {% endcall %}
+  </div>
+
+  <details class="card">
+    <summary class="cursor-pointer px-6 py-4 font-medium">Jinja usage</summary>
+    <section>
+      <pre class="overflow-x-auto rounded-md bg-muted p-4 text-xs"><code>{% raw %}{% from "kdui/patterns/form_page.html" import form_page %}
+
+{% call form_page(
+  title="New project",
+  card_title="Project details",
+  action=url_for("projects.create"),
+  cancel_url=url_for("projects.index"),
+  submit_label="Create project"
+) %}
+  <!-- Your reusable field macros or inputs -->
+{% endcall %}{% endraw %}</code></pre>
+    </section>
+  </details>
+</section>
+{% endblock %}

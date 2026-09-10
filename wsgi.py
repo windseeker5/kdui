@@ -1,4 +1,10 @@
 import argparse
+import sys
+from pathlib import Path
+
+# Make the local src-layout package available when running the showroom
+# directly from a repository checkout.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from app import create_app
 

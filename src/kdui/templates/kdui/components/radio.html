@@ -1,0 +1,48 @@
+{#
+  Radio group component.
+
+  Usage:
+    {% from "kdui/components/radio.html" import radio_group %}
+    {{ radio_group(name="plan", label="Choose a plan", options=[
+      {"value": "plus", "label": "Plus", "description": "For individuals and small teams."},
+      {"value": "pro", "label": "Pro", "description": "For growing businesses."}
+    ], selected="pro") }}
+
+  Params:
+    name        {string}  Radio input name.
+    label       {string}  Accessible label for the group.
+    options     {list}    Each option: {value, label, description, id, checked}.
+    selected    {string}  Value that should be checked by default.
+    class_      {string}  Extra classes for the radiogroup wrapper.
+    attrs       {dict}    Additional attributes for the radiogroup wrapper.
+#}
+
+{% macro radio_group(name, label=None, options=[], selected=None, class_='', attrs={}) %}
+<div
+  role="radiogroup"
+  aria-label="{{ label or name }}"
+  data-slot="radio-group"
+  class="{{ class_ }}"
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  {% for opt in options %}
+  {% set opt_id = opt.id if opt.id else name ~ '-' ~ loop.index %}
+  {% set is_checked = (selected == opt.value) or opt.checked %}
+  <div role="group" class="field" data-orientation="horizontal">
+    <input
+      type="radio"
+      id="{{ opt_id }}"
+      name="{{ name }}"
+      value="{{ opt.value }}"
+      class="input"
+      {% if is_checked %}checked{% endif %}
+      {% if opt.disabled %}disabled{% endif %}
+    />
+    <section>
+      <label for="{{ opt_id }}">{{ opt.label }}</label>
+      {% if opt.description %}<p>{{ opt.description }}</p>{% endif %}
+    </section>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}

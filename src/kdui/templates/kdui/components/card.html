@@ -1,0 +1,44 @@
+{#
+  Card component wrapper.
+
+  Usage:
+    {% from "kdui/components/card.html" import card %}
+    {% call card(title="Login to your account", description="Enter your email below to login to your account") %}
+      <form><!-- fields --></form>
+    {% endcall %}
+
+  Params:
+    title       {string}  Card heading (h2). Optional.
+    description {string}  Subtext under the title. Optional.
+    action      {string}  Raw HTML for the top-right card-action slot. Optional.
+    footer      {string}  Raw HTML for the footer. Optional.
+    size        {string}  "sm" for the compact Basecoat card size. Optional.
+    class_       {string}  Extra classes on the card root. Optional.
+    header_class {string}  Extra classes on the header. Optional.
+    body_class   {string}  Extra classes on the body section. Optional.
+    footer_class {string}  Extra classes on the footer. Optional.
+    attrs        {dict}    Additional attributes on the card root. Optional.
+
+  Radius:
+    The macro intentionally adds no rounded utility. Basecoat Vega applies
+    `border-radius: var(--radius-xl)` to `.card` (14px with its default tokens).
+#}
+{% macro card(title=None, description=None, action=None, footer=None, size=None, class_='', header_class='', body_class='', footer_class='', attrs={}) %}
+<div class="card {{ class_ }}"{% if size %} data-size="{{ size }}"{% endif %}{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+  {% if title or description or action %}
+  <header{% if header_class %} class="{{ header_class }}"{% endif %}>
+    {% if title %}<h2>{{ title }}</h2>{% endif %}
+    {% if description %}<p>{{ description }}</p>{% endif %}
+    {% if action %}<div class="card-action">{{ action | safe }}</div>{% endif %}
+  </header>
+  {% endif %}
+  <section{% if body_class %} class="{{ body_class }}"{% endif %}>
+    {{ caller() }}
+  </section>
+  {% if footer %}
+  <footer{% if footer_class %} class="{{ footer_class }}"{% endif %}>
+    {{ footer | safe }}
+  </footer>
+  {% endif %}
+</div>
+{% endmacro %}
