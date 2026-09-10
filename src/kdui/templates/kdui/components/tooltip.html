@@ -1,0 +1,38 @@
+{#
+  Tooltip component.
+
+  Wraps a trigger element and shows a small floating tooltip on hover, powered
+  by Basecoat's built-in `[data-tooltip]` CSS. Keep `content` as plain text —
+  for richer HTML content, use the Popover component instead.
+
+  Usage:
+    {% from "kdui/components/tooltip.html" import tooltip %}
+    {% call tooltip(content="Add to library", side="top", align="center") %}
+      <button type="button" class="btn" data-size="icon" aria-label="Add to library">
+        <svg class="lucide lucide-plus size-4" ...>...</svg>
+      </button>
+    {% endcall %}
+
+  Params:
+    content {string}  Plain-text tooltip body.
+    side    {string}  top | bottom | left | right. Default "top".
+    align   {string}  start | center | end. Default "center".
+    arrow   {boolean} Show a small directional arrow. Default false (Basecoat's
+                      built-in arrow does not currently position itself per side).
+    class_  {string}  Extra classes for the wrapper span.
+    attrs   {dict}    Extra HTML attributes for the wrapper span.
+#}
+{% macro tooltip(content=None, side='top', align='center', arrow=False, class_='', attrs={}) %}
+{% set id = 'tooltip-' ~ (range(100000, 999999) | random | string) %}
+<span
+  id="{{ id }}"
+  class="tooltip inline-block {{ class_ }}"
+  data-tooltip="{% if content is not none %}{{ content | e }}{% endif %}"
+  data-side="{{ side }}"
+  data-align="{{ align }}"
+  {% if arrow %}data-arrow{% endif %}
+  {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}
+>
+  {% if caller is defined %}{{ caller() }}{% endif %}
+</span>
+{% endmacro %}

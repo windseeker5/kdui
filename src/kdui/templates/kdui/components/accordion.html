@@ -1,0 +1,29 @@
+{#
+  Accordion component.
+
+  Usage:
+    {% from "kdui/components/accordion.html" import accordion %}
+    {{ accordion(items=[
+      {"title": "Shipping options", "content": "We offer standard, express, and overnight shipping."},
+      {"title": "Return policy", "content": "Return within 30 days.", "open": true}
+    ]) }}
+
+  Params:
+    items   {list}  Each item: {title, content, open}.
+    class_  {string} Extra classes for the accordion container.
+    attrs   {dict}   Additional attributes for the accordion container.
+#}
+
+{% macro accordion(items=[], class_='', attrs={}) %}
+<section class="accordion {{ class_ }}" {% for key, value in (attrs or {}).items() %}{{ key }}="{{ value }}"{% endfor %}>
+  {% for item in items %}
+  <details {% if item.open %}open{% endif %}>
+    <summary>
+      {{ item.title | safe }}
+      <svg class="lucide lucide-chevron-down" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <section>{{ item.content | safe }}</section>
+  </details>
+  {% endfor %}
+</section>
+{% endmacro %}

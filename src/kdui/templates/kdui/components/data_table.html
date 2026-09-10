@@ -1,0 +1,221 @@
+{#
+  Data Table — MiniPass-style list component.
+
+  Provides three macros:
+    - table_toolbar(): centered filter tabs + a search input that collapses
+      to an icon on narrow containers and expands to replace the tabs.
+    - table_desktop() / table_mobile(): two distinct row renderings of the
+      same data (real card list on mobile, not a hidden-column table).
+    - preserve_filters(): hidden inputs that carry other active query params
+      through a search submit so tab and search state stay in sync.
+
+  Usage:
+    {% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, preserve_filters, table_empty_state %}
+    {% from "kdui/components/pagination.html" import pagination %}
+
+    <form method="get" action="{{ url_for("items.index") }}" class="contents">
+      {{ preserve_filters(current_filters) }}
+      <div class="card kdui-data-table">
+        <header>
+          {{ table_toolbar(
+               id="customers-toolbar",
+               tabs=tabs,
+               search_value=q,
+               search_placeholder="Search customers…"
+          ) }}
+        </header>
+
+        {% if rows %}
+          <div class="kdui-data-table__desktop">
+            {{ table_desktop(id="customers-table", rows=rows, columns=columns) }}
+          </div>
+          <div class="kdui-data-table__mobile">
+            {{ table_mobile(id="customers-list", rows=rows) }}
+          </div>
+        {% else %}
+          {{ table_empty_state(
+               icon='search',
+               title="No customers match your filters",
+               description="Try adjusting your search or filter criteria.",
+               action_url=reset_url,
+               action_label="Clear all filters"
+          ) }}
+        {% endif %}
+      </div>
+    </form>
+
+  Parameters:
+    table_toolbar:
+      - id (str): unique element id; required.
+      - tabs (list): same shape as filter_tabs()'s tabs.
+      - search_name (str): query parameter for the search input. Default "q".
+      - search_value (str): current search value. Default "".
+      - search_placeholder (str): placeholder text. Default "Search…".
+      - class_ (str): extra classes for the toolbar wrapper.
+      - attrs (dict): extra attributes on the toolbar wrapper.
+
+    preserve_filters:
+      - current_filters (dict): active filters dict.
+      - exclude (list): keys to skip. Default ["q"].
+
+    table_desktop:
+      - id (str): unique table id; required.
+      - rows (list): see below.
+      - columns (list): list of {label, class_} dicts.
+      - item_name (str): primary column label. Default "Item".
+
+    table_mobile:
+      - id (str): unique list id; required.
+      - rows (list): same shape as table_desktop().
+      - item_name (str): default avatar initials. Default "Item".
+
+    table_empty_state:
+      - icon (str): lucide icon name. Default "inbox".
+      - icon_color (str): optional CSS color.
+      - title (str): heading.
+      - description (str): supporting text.
+      - action_url / action_label: optional reset link.
+      - other_matches_count (int): optional “matches in other tabs" hint.
+
+  Row data shape:
+    rows = [{
+      "id": <unique id>,
+      "avatar_name": <string for initials>,
+      "avatar_url": <optional image src>,
+      "primary": <bold primary text>,
+      "secondary": <muted secondary line>,
+      "mobile_secondary": <secondary line for mobile card (optional)>,
+      "cells": [<html per extra column>],
+      "badges": [{"text": ..., "variant": ...}],
+      "mobile_badges": [{"text": ..., "variant": ...}],
+      "actions": [<action_menu items>]
+    }]
+#}
+
+{% from "kdui/components/filter_tabs.html" import filter_tabs %}
+{% from "kdui/components/action_menu.html" import action_menu %}
+{% from "kdui/components/avatar.html" import avatar %}
+{% from "kdui/components/badge.html" import badge %}
+{% from "kdui/components/empty_state.html" import empty_state %}
+
+{% macro table_toolbar(id, tabs, search_name="q", search_value="", search_placeholder="Search…", class_='', attrs={}) %}
+<div class="kdui-table-toolbar {{ class_ }}" id="{{ id }}" role="search" aria-label="Search and filters" {% for k,v in (attrs or {}).items() %}{% if v is sameas true %} {{ k }}{% elif v is not sameas false and v is not none %} {{ k }}="{{ v }}"{% endif %}{% endfor %}>
+  <div class="kdui-table-toolbar__search">
+    <button type="button" class="kdui-table-toolbar__search-btn" aria-label="Search" aria-expanded="false" aria-controls="{{ id }}-input">
+      <svg class="kdui-table-toolbar__icon-search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <svg class="kdui-table-toolbar__icon-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <input type="search" id="{{ id }}-input" class="kdui-table-toolbar__search-input" name="{{ search_name }}" value="{{ search_value }}" placeholder="{{ search_placeholder }}" autocomplete="off">
+  </div>
+  {{ filter_tabs(tabs=tabs) }}
+</div>
+{% endmacro %}
+
+{% macro preserve_filters(current_filters, exclude=['q']) %}
+{%- for key, value in current_filters.items() if key not in exclude and value %}
+<input type="hidden" name="{{ key }}" value="{{ value }}">
+{%- endfor %}
+{% endmacro %}
+
+{% macro _render_avatar(row) %}
+{% set name = row.avatar_name | default(row.primary | default('?')) %}
+{{ avatar(src=row.avatar_url | default(None), alt=name, size="sm") }}
+{% endmacro %}
+
+{% macro _render_badges(badge_list) %}
+{% for b in badge_list %}
+  {{ badge(label=b.text, variant=(b.variant | default('secondary'))) }}
+{% endfor %}
+{% endmacro %}
+
+{% macro table_desktop(id, rows, columns=None, item_name="Item") %}
+<div class="table-container">
+  <table class="table" id="{{ id }}">
+    <thead>
+      <tr>
+        <th>{{ item_name }}</th>
+        {% if columns %}
+          {% for col in columns %}
+            <th class="{{ col.class_ | default('') }}">{{ col.label }}</th>
+          {% endfor %}
+        {% endif %}
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>
+          <div class="flex items-center gap-3 min-w-0">
+            {{ _render_avatar(row) }}
+            <div class="min-w-0">
+              <div class="font-medium truncate">{{ row.primary }}</div>
+              {% if row.secondary %}<div class="text-xs text-muted-foreground truncate">{{ row.secondary }}</div>{% endif %}
+              {% if row.badges %}
+                <div class="mt-1 flex flex-wrap gap-1">
+                  {{ _render_badges(row.badges) }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        {% if columns %}
+          {% for cell in row.cells | default([]) %}
+            <td class="{{ columns[loop.index0].class_ | default('') }}">{{ cell | safe }}</td>
+          {% endfor %}
+        {% endif %}
+        <td class="text-end align-middle">
+          {% if row.actions %}
+            {{ action_menu(id=id ~ "-actions-" ~ row.id, items=row.actions, icon_only=true) }}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{% macro table_mobile(id, rows, item_name="Item") %}
+<div class="kdui-table-mobile-list" id="{{ id }}">
+  {% for row in rows %}
+  {% set mobile_secondary = row.mobile_secondary | default(row.secondary) %}
+  {% set mobile_badges = row.mobile_badges | default(row.badges) %}
+  <div class="kdui-table-mobile-card">
+    {{ _render_avatar(row) }}
+    <div class="kdui-table-mobile-card__body">
+      <div class="kdui-table-mobile-card__primary">{{ row.primary }}</div>
+      {% if mobile_secondary %}<div class="kdui-table-mobile-card__secondary">{{ mobile_secondary }}</div>{% endif %}
+      {% if mobile_badges %}
+        <div class="kdui-table-mobile-card__badges">
+          {{ _render_badges(mobile_badges) }}
+        </div>
+      {% endif %}
+    </div>
+    {% if row.actions %}
+      {{ action_menu(id=id ~ "-actions-" ~ row.id, items=row.actions, icon_only=true) }}
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro table_empty_state(icon="inbox", icon_color=None, title="No results", description=None, action_url=None, action_label=None, other_matches_count=None) %}
+{% set icon_svg %}
+{% if icon == "search" %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"{% if icon_color %} style="color: {{ icon_color }}"{% endif %}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+{% else %}
+<svg class="lucide lucide-inbox" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"{% if icon_color %} style="color: {{ icon_color }}"{% endif %}><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+{% endif %}
+{% endset %}
+{% set action %}
+  {% if action_url and action_label %}
+    <a href="{{ action_url }}" class="btn" data-variant="outline">{{ action_label }}</a>
+  {% endif %}
+{% endset %}
+{% set desc = description or '' %}
+{% if other_matches_count %}
+  {% set desc = (description + ' ' if description else '') + other_matches_count | string + " match" + ("es" if other_matches_count != 1 else "") + " found in other tabs." %}
+{% endif %}
+{{ empty_state(title=title, description=desc, icon=icon_svg, action=action | trim) }}
+{% endmacro %}

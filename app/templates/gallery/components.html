@@ -1,44 +1,44 @@
 {% extends "layouts/app.html" %}
-{% from "components/page_header.html" import page_header %}
-{% from "components/alert.html"       import alert %}
-{% from "components/empty_state.html" import empty_state %}
-{% from "components/metric_pill.html" import metric_pill %}
-{% from "components/action_menu.html" import action_menu %}
-{% from "components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
-{% from "components/pagination.html" import pagination %}
-{% from "components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
-{% from "components/file_upload.html" import file_upload %}
-{% from "components/timeline.html" import timeline %}
-{% from "components/avatar.html" import avatar, avatar_group %}
-{% from "components/progress.html" import progress %}
-{% from "components/skeleton.html" import skeleton %}
-{% from "components/breadcrumb.html" import breadcrumb %}
-{% from "components/kbd.html" import kbd, kbd_combo %}
-{% from "components/switch.html" import switch %}
-{% from "components/checkbox.html" import checkbox %}
-{% from "components/radio.html" import radio_group %}
-{% from "components/textarea.html" import textarea %}
-{% from "components/popover.html" import popover %}
-{% from "components/tooltip.html" import tooltip %}
-{% from "components/drawer.html" import drawer %}
-{% from "components/accordion.html" import accordion %}
-{% from "components/button_group.html" import button_group %}
-{% from "components/alert_dialog.html" import alert_dialog %}
-{% from "components/chart.html" import chart %}
-{% from "components/card.html" import card %}
-{% from "components/button.html" import button %}
-{% from "components/badge.html" import badge %}
-{% from "components/field.html" import field, fieldset %}
-{% from "components/item.html" import item, item_group %}
-{% from "components/slider.html" import slider %}
-{% from "components/theme_switcher.html" import theme_switcher %}
-{% from "components/command_search.html" import command_search %}
-{% from "basecoat/command.html.jinja" import command %}
-{% from "basecoat/dialog.html.jinja" import dialog %}
-{% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
-{% from "basecoat/select.html.jinja" import select %}
-{% from "basecoat/tabs.html.jinja" import tabs %}
-{% from "basecoat/toast.html.jinja" import toaster %}
+{% from "kdui/components/page_header.html" import page_header %}
+{% from "kdui/components/alert.html"       import alert %}
+{% from "kdui/components/empty_state.html" import empty_state %}
+{% from "kdui/components/metric_pill.html" import metric_pill %}
+{% from "kdui/components/action_menu.html" import action_menu %}
+{% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
+{% from "kdui/components/pagination.html" import pagination %}
+{% from "kdui/components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
+{% from "kdui/components/file_upload.html" import file_upload %}
+{% from "kdui/components/timeline.html" import timeline %}
+{% from "kdui/components/avatar.html" import avatar, avatar_group %}
+{% from "kdui/components/progress.html" import progress %}
+{% from "kdui/components/skeleton.html" import skeleton %}
+{% from "kdui/components/breadcrumb.html" import breadcrumb %}
+{% from "kdui/components/kbd.html" import kbd, kbd_combo %}
+{% from "kdui/components/switch.html" import switch %}
+{% from "kdui/components/checkbox.html" import checkbox %}
+{% from "kdui/components/radio.html" import radio_group %}
+{% from "kdui/components/textarea.html" import textarea %}
+{% from "kdui/components/popover.html" import popover %}
+{% from "kdui/components/tooltip.html" import tooltip %}
+{% from "kdui/components/drawer.html" import drawer %}
+{% from "kdui/components/accordion.html" import accordion %}
+{% from "kdui/components/button_group.html" import button_group %}
+{% from "kdui/components/alert_dialog.html" import alert_dialog %}
+{% from "kdui/components/chart.html" import chart %}
+{% from "kdui/components/card.html" import card %}
+{% from "kdui/components/button.html" import button %}
+{% from "kdui/components/badge.html" import badge %}
+{% from "kdui/components/field.html" import field, fieldset %}
+{% from "kdui/components/item.html" import item, item_group %}
+{% from "kdui/components/slider.html" import slider %}
+{% from "kdui/components/theme_switcher.html" import theme_switcher %}
+{% from "kdui/components/command_search.html" import command_search %}
+{% from "kdui/basecoat/command.html.jinja" import command %}
+{% from "kdui/basecoat/dialog.html.jinja" import dialog %}
+{% from "kdui/basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
+{% from "kdui/basecoat/select.html.jinja" import select %}
+{% from "kdui/basecoat/tabs.html.jinja" import tabs %}
+{% from "kdui/basecoat/toast.html.jinja" import toaster %}
 
 {% block title %}Components – UI Gallery{% endblock %}
 {% block scripts %}<script src="{{ url_for('static', filename='js/components/command_search.js') }}" defer></script>{% endblock %}
@@ -75,7 +75,7 @@
 
 {# ── Avatar ── #}
 {% call section("Avatar", "Profile picture with image fallback, sizes, badge, and rounded shape.", '
-{% from "components/avatar.html" import avatar %}
+{% from "kdui/components/avatar.html" import avatar %}
 {{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN") }}
 {{ avatar(fallback="KD", size="sm") }}
 {{ avatar(fallback="AB", size="lg", shape="rounded") }}
@@ -91,7 +91,7 @@
 
 {# ── Avatar Group ── #}
 {% call section("Avatar Group", "Stacked avatars with a remaining-count bubble.", '
-{% from "components/avatar.html" import avatar_group %}
+{% from "kdui/components/avatar.html" import avatar_group %}
 {{ avatar_group([
   {"src": "https://github.com/shadcn.png", "alt": "shadcn", "fallback": "CN"},
   {"src": "https://github.com/maxleiter.png", "alt": "maxleiter", "fallback": "ML"},
@@ -107,7 +107,7 @@
 
 {# ── Progress ── #}
 {% call section("Progress", "Accessible progress bar with optional label and percentage.", '
-{% from "components/progress.html" import progress %}
+{% from "kdui/components/progress.html" import progress %}
 {{ progress(value=66, label="Upload progress", show_value=true) }}
 ') %}
   {{ progress(value=66, label="Upload progress", show_value=true) }}
@@ -115,7 +115,7 @@
 
 {# ── Skeleton ── #}
 {% call section("Skeleton", "Loading placeholders that match Basecoat’s pulse animation.", '
-{% from "components/skeleton.html" import skeleton %}
+{% from "kdui/components/skeleton.html" import skeleton %}
 <div class="flex items-center gap-4">
   {{ skeleton(width="2.5rem", height="2.5rem", circle=true) }}
   <div class="grid gap-2">
@@ -135,7 +135,7 @@
 
 {# ── Breadcrumb ── #}
 {% call section("Breadcrumb", "Navigation trail using Basecoat’s .breadcrumb styles.", '
-{% from "components/breadcrumb.html" import breadcrumb %}
+{% from "kdui/components/breadcrumb.html" import breadcrumb %}
 {{ breadcrumb(items=[
   {"label": "Home", "url": "/"},
   {"label": "Customers", "url": "/customers"},
@@ -151,7 +151,7 @@
 
 {# ── KBD ── #}
 {% call section("KBD", "Keyboard keys and shortcut combos.", '
-{% from "components/kbd.html" import kbd, kbd_combo %}
+{% from "kdui/components/kbd.html" import kbd, kbd_combo %}
 {{ kbd_combo(["Ctrl", "B"]) }}
 {{ kbd("⌘") }}
 ') %}
@@ -167,7 +167,7 @@
 
 {# ── Button ── #}
 {% call section("Button", "Basecoat button with all documented variants and sizes.", '
-{% from "components/button.html" import button %}
+{% from "kdui/components/button.html" import button %}
 {{ button("Primary") }}
 {{ button("Secondary", variant="secondary") }}
 {{ button("Outline", variant="outline") }}
@@ -185,7 +185,7 @@
 
 {# ── Badge ── #}
 {% call section("Badge", "Basecoat status and label indicator.", '
-{% from "components/badge.html" import badge %}
+{% from "kdui/components/badge.html" import badge %}
 {{ badge("Default") }}
 {{ badge("Secondary", variant="secondary") }}
 {{ badge("Destructive", variant="destructive") }}
@@ -216,7 +216,7 @@
 
 {# ── Field ── #}
 {% call section("Field", "Accessible Basecoat field and fieldset structure for any form control.", '
-{% from "components/field.html" import field %}
+{% from "kdui/components/field.html" import field %}
 {% call field(id="company", label="Company", description="Your legal company name.") %}
   <input id="company" name="company" class="input" placeholder="Acme Inc." />
 {% endcall %}
@@ -230,7 +230,7 @@
 
 {# ── File Upload ── #}
 {% call section("File Upload", "Tap-friendly file picker with drag/drop and optional image preview. JavaScript behavior is progressive enhancement.", '
-{% from "components/file_upload.html" import file_upload %}
+{% from "kdui/components/file_upload.html" import file_upload %}
 
 <form method="post" enctype="multipart/form-data">
   <div id="avatar-preview-container" class="hidden">
@@ -268,7 +268,7 @@
 
 {# ── Card ── #}
 {% call section("Card", "The standard Basecoat card, including its official radius, spacing, header action, body, and footer.", '
-{% from "components/card.html" import card %}
+{% from "kdui/components/card.html" import card %}
 {% call card(
   title="Login to your account",
   description="Enter your email below to login to your account",
@@ -306,7 +306,7 @@
 
 {# ── KPI Card — Desktop ── #}
 {% call section("KPI Card — Desktop", "Compact stat card with trend badge, period dropdown, and an edge-to-edge sparkline chart.", '
-{% from "components/kpi_card.html" import kpi_card_desktop %}
+{% from "kdui/components/kpi_card.html" import kpi_card_desktop %}
 {{ kpi_card_desktop(
      id="kpi-revenue", label="Revenue", value=1248, format="currency",
      change=12.4, trend_data=[900,940,880,1010,1090,1150,1248], chart_type="area"
@@ -328,7 +328,7 @@
 
 {# ── KPI Card — Mobile ── #}
 {% call section("KPI Card — Mobile", "Simpler swipeable card: centered value, trend, and period caption. No chart, no dropdown.", '
-{% from "components/kpi_card.html" import kpi_card_mobile %}
+{% from "kdui/components/kpi_card.html" import kpi_card_mobile %}
 {{ kpi_card_mobile(id="kpi-revenue-m", label="Revenue", value=1248, format="currency", change=12.4) }}
 ') %}
   <div class="kdui-kpi-mobile-scroll max-w-sm w-full">
@@ -339,7 +339,7 @@
 
 {# ── Alert ── #}
 {% call section("Alert", "Informational and error messages.", '
-{% from "components/alert.html" import alert %}
+{% from "kdui/components/alert.html" import alert %}
 {{ alert(message="Your settings have been saved.") }}
 {{ alert(title="Error", message="Something went wrong.", variant="destructive") }}
 ') %}
@@ -349,8 +349,8 @@
 
 {# ── Data Table + Filter Tabs ── #}
 {% call section("Data Table", "Searchable, filterable table toolbar with separate desktop and mobile row views, plus a matching empty state.", '
-{% from "components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
-{% from "components/pagination.html" import pagination %}
+{% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
+{% from "kdui/components/pagination.html" import pagination %}
 
 <form method="get" action="/records" class="contents">
   {{ preserve_filters(current_filters) }}
@@ -495,7 +495,7 @@
 
 {# ── Action Menu ── #}
 {% call section("Action Menu", "Compact row or card actions powered by Basecoat's dropdown menu.", '
-{% from "components/action_menu.html" import action_menu %}
+{% from "kdui/components/action_menu.html" import action_menu %}
 {{ action_menu(id="record-actions", items=[
   {"label": "View", "url": "/records/1"},
   {"label": "Edit", "url": "/records/1/edit"},
@@ -513,7 +513,7 @@
 
 {# ── Empty State ── #}
 {% call section("Empty State", "Shown when a list or section has no data.", '
-{% from "components/empty_state.html" import empty_state %}
+{% from "kdui/components/empty_state.html" import empty_state %}
 {{ empty_state(
   title="No customers yet",
   description="Add your first customer to get started.",
@@ -529,7 +529,7 @@
 
 {# ── Timeline ── #}
 {% call section("Timeline", "Vertical chronological list for activity, audit history, and project milestones.", '
-{% from "components/timeline.html" import timeline %}
+{% from "kdui/components/timeline.html" import timeline %}
 {{ timeline(items=[
   {"date": "Aug 14, 2026", "title": "Release deployed", "description": "Version 2.4 is live.", "badge": "Release"},
   {"date": "Aug 12, 2026", "title": "Review approved", "badge": "Review", "badge_variant": "secondary"}
@@ -546,7 +546,7 @@
 
 {# ── Metric Pill ── #}
 {% call section("Metric Pill", "Compact inline pill for a labeled metric. Good for dense dashboards or summary rows.", '
-{% from "components/metric_pill.html" import metric_pill %}
+{% from "kdui/components/metric_pill.html" import metric_pill %}
 {{ metric_pill(label="Net Worth", value="$412,300") }}
 {{ metric_pill(label="Debts", value="$18,900", trend="down") }}
 {{ metric_pill(label="Assets Sold", value="+3 this month", trend="up") }}
@@ -558,7 +558,7 @@
 
 {# ── Switch ── #}
 {% call section("Switch", "Toggle control with optional description. Uses native checkbox + role=switch.", '
-{% from "components/switch.html" import switch %}
+{% from "kdui/components/switch.html" import switch %}
 {{ switch(id="gallery-airplane", label="Airplane Mode") }}
 {{ switch(
   id="gallery-focus",
@@ -580,7 +580,7 @@
 
 {# ── Checkbox ── #}
 {% call section("Checkbox", "Single checkbox with optional description.", '
-{% from "components/checkbox.html" import checkbox %}
+{% from "kdui/components/checkbox.html" import checkbox %}
 {{ checkbox(id="gallery-terms", name="terms", label="Accept terms and conditions", description="By clicking this checkbox, you agree to the terms.") }}
 ') %}
   <div class="grid w-full max-w-md gap-3">
@@ -591,7 +591,7 @@
 
 {# ── Radio Group ── #}
 {% call section("Radio Group", "Accessible radio group with descriptions.", '
-{% from "components/radio.html" import radio_group %}
+{% from "kdui/components/radio.html" import radio_group %}
 {{ radio_group(name="plan", label="Choose a plan", options=[
   {"value": "plus", "label": "Plus", "description": "For individuals and small teams."},
   {"value": "pro", "label": "Pro", "description": "For growing businesses."},
@@ -607,7 +607,7 @@
 
 {# ── Textarea ── #}
 {% call section("Textarea", "Multi-line text input with label and description.", '
-{% from "components/textarea.html" import textarea %}
+{% from "kdui/components/textarea.html" import textarea %}
 {{ textarea(id="gallery-message", name="message", label="Message", description="Write a short message.", placeholder="Type your message here…") }}
 ') %}
   <div class="w-full max-w-md">
@@ -617,7 +617,7 @@
 
 {# ── Popover ── #}
 {% call section("Popover", "Displays content triggered by a button. Initialized by Basecoat’s popover behavior.", '
-{% from "components/popover.html" import popover %}
+{% from "kdui/components/popover.html" import popover %}
 {% call popover(trigger="Open popover", title="Dimensions", description="Set the dimensions for the layer.", width="w-72") %}
   <p class="text-sm">Your custom content here.</p>
 {% endcall %}
@@ -634,7 +634,7 @@
 
 {# ── Tooltip ── #}
 {% call section("Tooltip", "Lightweight hover hint powered by Basecoat’s built-in data-tooltip CSS.", '
-{% from "components/tooltip.html" import tooltip %}
+{% from "kdui/components/tooltip.html" import tooltip %}
 {% call tooltip(content="Add to library", side="top") %}
   <button type="button" class="btn" data-size="icon" aria-label="Add to library">
     <svg class="lucide lucide-plus size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -657,7 +657,7 @@
 
 {# ── Drawer ── #}
 {% call section("Drawer", "Slide-out panel using the native <dialog> element. Supports all four sides.", '
-{% from "components/drawer.html" import drawer %}
+{% from "kdui/components/drawer.html" import drawer %}
 {% call drawer(trigger="Open drawer", title="Move Goal", description="Set your daily activity goal.", side="right") %}
   <p>Drawer body content.</p>
 {% endcall %}
@@ -669,7 +669,7 @@
 
 {# ── Accordion ── #}
 {% call section("Accordion", "Native <details> accordion with Basecoat styling.", '
-{% from "components/accordion.html" import accordion %}
+{% from "kdui/components/accordion.html" import accordion %}
 {{ accordion(items=[
   {"title": "Shipping options", "content": "We offer standard, express, and overnight shipping."},
   {"title": "Return policy", "content": "Return within 30 days.", "open": true}
@@ -684,7 +684,7 @@
 
 {# ── Button Group ── #}
 {% call section("Button Group", "Groups related buttons or controls together.", '
-{% from "components/button_group.html" import button_group %}
+{% from "kdui/components/button_group.html" import button_group %}
 {{ button_group(items=[
   "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Archive</button>" | safe,
   "<button type=\"button\" class=\"btn\" data-variant=\"outline\">Report</button>" | safe
@@ -699,7 +699,7 @@
 
 {# ── Alert Dialog ── #}
 {% call section("Alert Dialog", "Confirmation dialog for destructive or important actions.", '
-{% from "components/alert_dialog.html" import alert_dialog %}
+{% from "kdui/components/alert_dialog.html" import alert_dialog %}
 {{ alert_dialog(
   trigger="Delete Chat",
   title="Delete this chat?",
@@ -719,7 +719,7 @@
 
 {# ── Chart ── #}
 {% call section("Chart", "Lightweight server-rendered bar chart. No external JS library required.", '
-{% from "components/chart.html" import chart %}
+{% from "kdui/components/chart.html" import chart %}
 {{ chart(data=[
   {"month": "Jan", "sales": 120},
   {"month": "Feb", "sales": 200},
@@ -740,7 +740,7 @@
 
 {# ── Item ── #}
 {% call section("Item", "Flexible Basecoat content row with media, text, and actions.", '
-{% from "components/item.html" import item %}
+{% from "kdui/components/item.html" import item %}
 {{ item(title="Basic Item", description="A simple item.", variant="outline") }}
 ') %}
   <div class="w-full max-w-md">
@@ -750,7 +750,7 @@
 
 {# ── Slider ── #}
 {% call section("Slider", "Basecoat’s native range control with synchronized value output.", '
-{% from "components/slider.html" import slider %}
+{% from "kdui/components/slider.html" import slider %}
 {{ slider(id="temperature", label="Temperature", value=50, show_value=true) }}
 ') %}
   <div class="w-full max-w-sm">{{ slider(id="gallery-temperature", label="Temperature", value=50, show_value=true) }}</div>
@@ -758,7 +758,7 @@
 
 {# ── Command Search ── #}
 {% call section("Command Search", "Optional reusable command palette for searching links and subsections.", '
-{% from "components/command_search.html" import command_search %}
+{% from "kdui/components/command_search.html" import command_search %}
 {{ command_search(items=[
   {"type": "group", "label": "Pages", "items": [
     {"label": "Dashboard", "url": "/app/dashboard"},
@@ -768,16 +768,16 @@
 ') %}
   {{ command_search(items=[
     {"type": "group", "label": "Pages", "items": [
-      {"label": "<span>Dashboard</span>", "url": url_for("dashboard.index"), "keywords": "home overview"},
-      {"label": "<span>Customers</span>", "url": url_for("dashboard.customers"), "keywords": "crm contacts"},
-      {"label": "<span>Settings</span>", "url": url_for("dashboard.settings"), "keywords": "preferences"}
+      {"label": "<span>Components</span>", "url": url_for("gallery.components"), "keywords": "catalog macros"},
+      {"label": "<span>Patterns</span>", "url": url_for("gallery.patterns"), "keywords": "forms compositions"},
+      {"label": "<span>Maintainer guide</span>", "url": url_for("gallery.maintainer"), "keywords": "release basecoat"}
     ]}
   ], id="gallery-command-search") }}
 {% endcall %}
 
 {# ── Command ── #}
 {% call section("Command", "Searchable command menu using Basecoat’s official Jinja macro.", '
-{% from "basecoat/command.html.jinja" import command %}
+{% from "kdui/basecoat/command.html.jinja" import command %}
 {{ command(id="commands", items=[{"label": "Calendar", "keywords": "date event"}]) }}
 ') %}
   <div class="w-full max-w-sm">
@@ -794,7 +794,7 @@
 
 {# ── Dialog ── #}
 {% call section("Dialog", "Modal content using Basecoat’s official Jinja macro.", '
-{% from "basecoat/dialog.html.jinja" import dialog %}
+{% from "kdui/basecoat/dialog.html.jinja" import dialog %}
 {% call dialog(id="profile-dialog", trigger="Open Dialog", title="Edit profile", trigger_attrs={"class": "btn", "data-variant": "outline"}) %}Profile form{% endcall %}
 ') %}
   {% call dialog(id="gallery-dialog", trigger="Open Dialog", title="Edit profile", description="Make changes to your profile here.", trigger_attrs={"class": "btn", "data-variant": "outline"}) %}
@@ -804,7 +804,7 @@
 
 {# ── Dropdown Menu ── #}
 {% call section("Dropdown Menu", "Accessible menu using Basecoat’s official Jinja macro.", '
-{% from "basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
+{% from "kdui/basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
 {{ dropdown_menu(trigger="Open", items=[{"label": "Profile"}, {"type": "separator"}, {"label": "Log out"}], trigger_attrs={"class": "btn"}) }}
 ') %}
   {{ dropdown_menu(id="gallery-dropdown", trigger="Open", items=[
@@ -815,7 +815,7 @@
 
 {# ── Select ── #}
 {% call section("Select", "Custom listbox using Basecoat’s official Jinja macro.", '
-{% from "basecoat/select.html.jinja" import select %}
+{% from "kdui/basecoat/select.html.jinja" import select %}
 {{ select(id="fruit", name="fruit", placeholder="Select a fruit", items=[{"value": "apple", "label": "Apple"}]) }}
 ') %}
   {{ select(id="gallery-select", name="fruit", placeholder="Select a fruit", trigger_attrs={"class": "w-[180px]"}, items=[
@@ -827,7 +827,7 @@
 
 {# ── Tabs ── #}
 {% call section("Tabs", "Keyboard-accessible tabs using Basecoat’s official Jinja macro.", '
-{% from "basecoat/tabs.html.jinja" import tabs %}
+{% from "kdui/basecoat/tabs.html.jinja" import tabs %}
 {{ tabs(id="account-tabs", tabsets=[{"tab": "Account", "panel": "Account content."}, {"tab": "Password", "panel": "Password content."}]) }}
 ') %}
   <div class="w-full max-w-sm">
@@ -839,7 +839,7 @@
 
 {# ── Toast ── #}
 {% call section("Toast", "Transient feedback using Basecoat’s official toaster macro and API.", '
-{% from "basecoat/toast.html.jinja" import toaster %}
+{% from "kdui/basecoat/toast.html.jinja" import toaster %}
 {{ toaster(id="toaster") }}
 ') %}
   <button type="button" class="btn" data-variant="outline" onclick="document.getElementById('toaster').toast({category: 'success', title: 'Success', description: 'Your changes have been saved.', cancel: {label: 'Dismiss'}})">Show toast</button>
@@ -848,7 +848,7 @@
 
 {# ── Theme Switcher ── #}
 {% call section("Theme Switcher", "Exact Basecoat light/dark switcher composition.", '
-{% from "components/theme_switcher.html" import theme_switcher %}
+{% from "kdui/components/theme_switcher.html" import theme_switcher %}
 {{ theme_switcher() }}
 ') %}
   {{ theme_switcher() }}

@@ -27,5 +27,5 @@ Thumbs.db
 .idea/
 *.swp
 
-# Tailwind source map - output.css is intentionally committed so teammates skip Node
-# app/static/css/output.css   <- intentionally NOT gitignored
+# Packaged output.css is intentionally committed so consumer apps skip Node.
+# src/kdui/static/kdui/css/output.css is intentionally not ignored.

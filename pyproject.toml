@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flask-kdui"
+version = "0.2.0"
+description = "Reusable Basecoat-powered Jinja UI macros for Flask"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["Flask>=3.0"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kdui = ["templates/**/*.html", "templates/**/*.jinja", "static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
