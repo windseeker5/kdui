@@ -1,0 +1,142 @@
+{#
+  Current-year activity heatmap with selectable dates and inline details.
+
+  Usage:
+    {% from "kdui/components/activity_heatmap.html" import activity_heatmap %}
+    {{ activity_heatmap(days=[
+      {
+        "date": "2026-09-11",
+        "count": 3,
+        "activities": [
+          {"time": "09:14", "title": "Contact created", "type": "Contact"},
+          {"time": "10:32", "title": "Follow-up email sent", "type": "Email"}
+        ]
+      }
+    ], selected_date="2026-09-11", label="activities") }}
+
+  Params:
+    days          {list}   Date dictionaries. Each accepts date (ISO string/date),
+                           count, optional level (0–4), and activities.
+    selected_date {string} Initially selected ISO date. Optional.
+    label         {string} Noun used in the summary and accessible labels.
+    empty_message {string} Message shown when a selected date has no records.
+    class_        {string} Extra classes on the root element.
+    attrs         {dict}   Additional attributes on the root element.
+
+  Each activity accepts title and optional time, description, type, and url.
+  The kdui_activity_year filter creates the current-year calendar and computes
+  levels when they are not supplied. Future dates are displayed but disabled.
+#}
+{% macro activity_heatmap(days=[], selected_date=None, label='activities', empty_message='No activities recorded for this date.', class_='', attrs={}) %}
+{% set calendar = days | kdui_activity_year %}
+{% set id = 'activity-heatmap-' ~ (range(100000, 999999) | random | string) %}
+<div
+  id="{{ id }}"
+  class="kdui-activity-heatmap {{ class_ }}"
+  data-kdui-activity-heatmap
+  data-empty-message="{{ empty_message }}"
+  {% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}
+>
+  <div class="kdui-activity-heatmap__summary">
+    <p><strong>{{ calendar.total }}</strong> {{ label }} in {{ calendar.year }}</p>
+  </div>
+
+  <div class="kdui-activity-heatmap__scroll" tabindex="0" aria-label="{{ calendar.year }} {{ label }} calendar. Scroll horizontally to see every month.">
+    <div class="kdui-activity-heatmap__calendar">
+      <div class="kdui-activity-heatmap__months" aria-hidden="true">
+        {% for month in calendar.months %}
+        <span style="grid-column: {{ month.week + 1 }} / span {{ month.span }}">{{ month.label }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="kdui-activity-heatmap__weekdays" aria-hidden="true">
+        <span style="grid-row: 2">Mon</span>
+        <span style="grid-row: 4">Wed</span>
+        <span style="grid-row: 6">Fri</span>
+      </div>
+
+      <div class="kdui-activity-heatmap__days">
+        {% for day in calendar.days %}
+          {% if day.future %}
+          <span
+            class="kdui-activity-heatmap__day"
+            data-level="0"
+            style="grid-column: {{ day.week + 1 }}; grid-row: {{ day.weekday + 1 }}"
+            aria-hidden="true"
+          ></span>
+          {% else %}
+          <button
+            type="button"
+            class="kdui-activity-heatmap__day{% if selected_date == day.date %} is-selected{% endif %}"
+            data-level="{{ day.level }}"
+            data-activity-date="{{ day.date }}"
+            data-activity-date-label="{{ day.label }}"
+            style="grid-column: {{ day.week + 1 }}; grid-row: {{ day.weekday + 1 }}"
+            title="{{ day.count }} {{ label }} on {{ day.label }}"
+            aria-label="{{ day.count }} {{ label }} on {{ day.label }}"
+            aria-pressed="{{ 'true' if selected_date == day.date else 'false' }}"
+          ></button>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="kdui-activity-heatmap__footer">
+        <span>Select a date to view activity</span>
+        <div class="kdui-activity-heatmap__legend" aria-label="Activity intensity from less to more">
+          <span>Less</span>
+          {% for level in range(5) %}<i data-level="{{ level }}"></i>{% endfor %}
+          <span>More</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="kdui-activity-heatmap__details" data-activity-details aria-live="polite" aria-atomic="false"{% if not selected_date %} hidden{% endif %}>
+    <div class="kdui-activity-heatmap__details-header">
+      <h3 data-activity-heading>
+        {% if selected_date %}Activity for {{ calendar.by_date.get(selected_date, {}).get('label', selected_date) }}{% endif %}
+      </h3>
+      <span aria-hidden="true"></span>
+      <button
+        type="button"
+        class="btn"
+        data-variant="ghost"
+        data-size="icon-sm"
+        data-activity-reset
+        aria-label="Close activity details"
+        title="Close activity details"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    {% for day in calendar.active_days %}
+    <div data-activity-panel="{{ day.date }}"{% if selected_date != day.date %} hidden{% endif %}>
+      {% if day.activities %}
+      <ol class="kdui-activity-heatmap__activity-list">
+        {% for activity in day.activities %}
+        <li>
+          <span class="kdui-activity-heatmap__marker" aria-hidden="true"></span>
+          <div class="kdui-activity-heatmap__activity-content">
+            <div class="kdui-activity-heatmap__activity-heading">
+              {% if activity.url %}<a href="{{ activity.url }}">{{ activity.title }}</a>{% else %}<p>{{ activity.title }}</p>{% endif %}
+              {% if activity.type %}<span class="badge" data-variant="secondary">{{ activity.type }}</span>{% endif %}
+            </div>
+            {% if activity.time %}<time>{{ activity.time }}</time>{% endif %}
+            {% if activity.description %}<p class="kdui-activity-heatmap__activity-description">{{ activity.description }}</p>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="kdui-activity-heatmap__empty">{{ empty_message }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <p data-activity-empty class="kdui-activity-heatmap__empty"{% if selected_date and selected_date not in calendar.by_date %} {% else %} hidden{% endif %}>{{ empty_message }}</p>
+  </section>
+</div>
+{% endmacro %}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Mountain lake</title>
+  <desc id="desc">Blue mountains reflected in a calm lake beneath a pale sky.</desc>
+  <rect width="1200" height="800" fill="#dbeafe"/>
+  <circle cx="930" cy="175" r="72" fill="#fbbf24"/>
+  <path d="M0 500 255 225l150 170 155-210 220 270 135-155 285 250v250H0Z" fill="#64748b"/>
+  <path d="m150 500 255-275 75 85 80-125 220 270 55-63 160 108Z" fill="#e2e8f0"/>
+  <path d="M0 510h1200v290H0Z" fill="#38bdf8"/>
+  <path d="M0 610c190-60 325 55 515-5s330 50 685-25v220H0Z" fill="#0ea5e9" opacity=".5"/>
+  <path d="M0 510h1200" stroke="#fff" stroke-width="10" opacity=".75"/>
+</svg>

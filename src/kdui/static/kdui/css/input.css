@@ -49,6 +49,246 @@
   usable width. Keeping the wrapper unclipped preserves inline action menus.
 */
 @layer components {
+  /* GitHub contribution colors are intentional for this data visualization. */
+  .kdui-activity-heatmap {
+    --heatmap-0: #ebedf0;
+    --heatmap-border: #d0d7de;
+    --heatmap-1: #9be9a8;
+    --heatmap-2: #40c463;
+    --heatmap-3: #30a14e;
+    --heatmap-4: #216e39;
+    width: 100%;
+  }
+
+  .dark .kdui-activity-heatmap {
+    --heatmap-0: #161b22;
+    --heatmap-border: #30363d;
+    --heatmap-1: #0e4429;
+    --heatmap-2: #006d32;
+    --heatmap-3: #26a641;
+    --heatmap-4: #39d353;
+  }
+
+  .kdui-activity-heatmap__summary {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .kdui-activity-heatmap__summary strong {
+    font-weight: 600;
+  }
+
+  .kdui-activity-heatmap__scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+  }
+
+  .kdui-activity-heatmap__scroll:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .kdui-activity-heatmap__calendar {
+    display: grid;
+    grid-template-columns: 2rem 742px;
+    grid-template-rows: 1rem 98px auto;
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .kdui-activity-heatmap__months {
+    display: grid;
+    grid-column: 2;
+    grid-template-columns: repeat(53, 11px);
+    gap: 3px;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .kdui-activity-heatmap__weekdays {
+    display: grid;
+    grid-column: 1;
+    grid-row: 2;
+    grid-template-rows: repeat(7, 11px);
+    gap: 3px;
+    color: var(--muted-foreground);
+    font-size: 0.6875rem;
+    line-height: 11px;
+  }
+
+  .kdui-activity-heatmap__days {
+    display: grid;
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: repeat(53, 11px);
+    grid-template-rows: repeat(7, 11px);
+    gap: 3px;
+  }
+
+  .kdui-activity-heatmap__day,
+  .kdui-activity-heatmap__legend i {
+    width: 11px;
+    height: 11px;
+    border: 1px solid var(--heatmap-border);
+    border-radius: 2px;
+    background: var(--heatmap-0);
+  }
+
+  .kdui-activity-heatmap__day {
+    padding: 0;
+  }
+
+  button.kdui-activity-heatmap__day {
+    cursor: pointer;
+  }
+
+  .kdui-activity-heatmap__day[data-level="1"],
+  .kdui-activity-heatmap__legend i[data-level="1"] { background: var(--heatmap-1); border-color: var(--heatmap-1); }
+  .kdui-activity-heatmap__day[data-level="2"],
+  .kdui-activity-heatmap__legend i[data-level="2"] { background: var(--heatmap-2); border-color: var(--heatmap-2); }
+  .kdui-activity-heatmap__day[data-level="3"],
+  .kdui-activity-heatmap__legend i[data-level="3"] { background: var(--heatmap-3); border-color: var(--heatmap-3); }
+  .kdui-activity-heatmap__day[data-level="4"],
+  .kdui-activity-heatmap__legend i[data-level="4"] { background: var(--heatmap-4); border-color: var(--heatmap-4); }
+
+  .kdui-activity-heatmap__day:hover,
+  .kdui-activity-heatmap__day.is-selected {
+    outline: 2px solid var(--foreground);
+    outline-offset: 1px;
+  }
+
+  .kdui-activity-heatmap__day:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .kdui-activity-heatmap__footer {
+    display: flex;
+    grid-column: 2;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  .kdui-activity-heatmap__legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .kdui-activity-heatmap__details {
+    margin-top: 1.5rem;
+  }
+
+  .kdui-activity-heatmap__details-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .kdui-activity-heatmap__details-header h3 {
+    flex: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .kdui-activity-heatmap__details-header > span {
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+
+  .kdui-activity-heatmap__details-header .btn {
+    flex: none;
+  }
+
+  .kdui-activity-heatmap__details-header svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .kdui-activity-heatmap__activity-list {
+    margin: 0 0 0 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kdui-activity-heatmap__activity-list > li {
+    position: relative;
+    display: flex;
+    gap: 0.875rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .kdui-activity-heatmap__activity-list > li:not(:last-child)::before {
+    position: absolute;
+    top: 0.75rem;
+    bottom: -0.25rem;
+    left: 0.3125rem;
+    width: 1px;
+    background: var(--border);
+    content: "";
+  }
+
+  .kdui-activity-heatmap__marker {
+    position: relative;
+    z-index: 1;
+    width: 0.6875rem;
+    height: 0.6875rem;
+    flex: none;
+    margin-top: 0.3rem;
+    border: 2px solid var(--heatmap-3);
+    border-radius: 999px;
+    background: var(--background);
+  }
+
+  .kdui-activity-heatmap__activity-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .kdui-activity-heatmap__activity-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .kdui-activity-heatmap__activity-heading a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .kdui-activity-heatmap__activity-content time,
+  .kdui-activity-heatmap__activity-description,
+  .kdui-activity-heatmap__empty {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+  }
+
+  .kdui-activity-heatmap__activity-description {
+    margin-top: 0.25rem;
+  }
+
+  .kdui-activity-heatmap__empty {
+    padding-block: 0.5rem 1rem;
+  }
+
   /* Closed Basecoat overlays must not widen the page while off-screen. */
   [data-popover][aria-hidden="true"] {
     display: none;

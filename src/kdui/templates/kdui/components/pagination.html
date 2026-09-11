@@ -62,3 +62,34 @@
 </nav>
 {% endif %}
 {% endmacro %}
+
+{# Dedicated compact pagination copied from the MiniPass mobile table view. #}
+{% macro pagination_mobile(page, pages, per_page, total, items_count, base_path, filters={}, page_param='page') %}
+<div class="kdui-pagination-mobile-footer">
+  {% if total > 0 and pages > 1 %}
+  <nav aria-label="Pagination" class="kdui-pagination-mobile">
+    {% if page > 1 %}
+    <a class="kdui-pagination-mobile__button" href="{{ base_path }}?{{ page_param }}={{ page - 1 }}{% for k, v in filters.items() %}&{{ k }}={{ v }}{% endfor %}" aria-label="Previous page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    {% else %}
+    <span class="kdui-pagination-mobile__button" aria-disabled="true" aria-label="Previous page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </span>
+    {% endif %}
+    <span class="kdui-pagination-mobile__label">Page <strong>{{ page }}</strong> of {{ pages }}</span>
+    {% if page < pages %}
+    <a class="kdui-pagination-mobile__button" href="{{ base_path }}?{{ page_param }}={{ page + 1 }}{% for k, v in filters.items() %}&{{ k }}={{ v }}{% endfor %}" aria-label="Next page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </a>
+    {% else %}
+    <span class="kdui-pagination-mobile__button" aria-disabled="true" aria-label="Next page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </span>
+    {% endif %}
+  </nav>
+  {% elif total == 0 %}
+  <span class="kdui-pagination-mobile__empty">No entries found</span>
+  {% endif %}
+</div>
+{% endmacro %}

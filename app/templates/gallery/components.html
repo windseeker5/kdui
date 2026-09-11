@@ -5,11 +5,13 @@
 {% from "kdui/components/metric_pill.html" import metric_pill %}
 {% from "kdui/components/action_menu.html" import action_menu %}
 {% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
-{% from "kdui/components/pagination.html" import pagination %}
+{% from "kdui/components/pagination.html" import pagination, pagination_mobile %}
 {% from "kdui/components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
 {% from "kdui/components/file_upload.html" import file_upload %}
 {% from "kdui/components/timeline.html" import timeline %}
-{% from "kdui/components/avatar.html" import avatar, avatar_group %}
+{% from "kdui/components/activity_heatmap.html" import activity_heatmap %}
+{% from "kdui/components/avatar.html" import avatar_initials, avatar_group, avatar_photo %}
+{% from "kdui/components/image_picker.html" import image_picker %}
 {% from "kdui/components/progress.html" import progress %}
 {% from "kdui/components/skeleton.html" import skeleton %}
 {% from "kdui/components/breadcrumb.html" import breadcrumb %}
@@ -41,7 +43,20 @@
 {% from "kdui/basecoat/toast.html.jinja" import toaster %}
 
 {% block title %}Components – UI Gallery{% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='js/components/command_search.js') }}" defer></script>{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("kdui:image-search", (event) => {
+    if (event.target.dataset.kduiImagePicker !== "gallery-cover-photo") return;
+    event.preventDefault();
+    const { query, setImage, setStatus } = event.detail;
+    setStatus("Searching…");
+    window.setTimeout(() => {
+      setImage("{{ url_for('static', filename='gallery/image-picker-demo.svg') }}", `Mountain lake result for ${query}`, "gallery-demo");
+      setStatus("1 image found and selected.", "success");
+    }, 450);
+  });
+</script>
+{% endblock %}
 {% block breadcrumb %}
   <a href="{{ url_for('gallery.index') }}" class="hover:underline text-muted-foreground">UI Gallery</a>
   <span class="mx-2 text-muted-foreground">/</span>Components
@@ -74,35 +89,25 @@
 {% endmacro %}
 
 {# ── Avatar ── #}
-{% call section("Avatar", "Profile picture with image fallback, sizes, badge, and rounded shape.", '
-{% from "kdui/components/avatar.html" import avatar %}
-{{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN") }}
-{{ avatar(fallback="KD", size="sm") }}
-{{ avatar(fallback="AB", size="lg", shape="rounded") }}
-{{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN", badge=true, badge_class="bg-green-600") }}
+{% call section("Avatar", "Colored-circle initials generated from a name. Each name receives the same deterministic color on every render.", '
+{% from "kdui/components/avatar.html" import avatar_initials %}
+{{ avatar_initials("Samuel Gendreau", size="sm") }}
+{{ avatar_initials("Marco Henry") }}
+{{ avatar_initials("Ken Dresdell", size="lg") }}
 ') %}
   <div class="flex flex-wrap items-center gap-4">
-    {{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN") }}
-    {{ avatar(fallback="KD", size="sm") }}
-    {{ avatar(fallback="AB", size="lg", shape="rounded") }}
-    {{ avatar(src="https://github.com/shadcn.png", alt="shadcn", fallback="CN", badge=true, badge_class="bg-green-600") }}
+    {{ avatar_initials("Samuel Gendreau", size="sm") }}
+    {{ avatar_initials("Marco Henry") }}
+    {{ avatar_initials("Ken Dresdell", size="lg") }}
   </div>
 {% endcall %}
 
 {# ── Avatar Group ── #}
-{% call section("Avatar Group", "Stacked avatars with a remaining-count bubble.", '
+{% call section("Avatar Group", "Stacked initials avatars with deterministic colors and a +N overflow bubble.", '
 {% from "kdui/components/avatar.html" import avatar_group %}
-{{ avatar_group([
-  {"src": "https://github.com/shadcn.png", "alt": "shadcn", "fallback": "CN"},
-  {"src": "https://github.com/maxleiter.png", "alt": "maxleiter", "fallback": "ML"},
-  {"src": "https://github.com/evilrabbit.png", "alt": "evilrabbit", "fallback": "ER"}
-], max=3, count=5) }}
+{{ avatar_group(names=["Samuel Gendreau", "Marco Henry", "Ken Dresdell", "Jean Martin Morin", "Marie Tremblay"], max=3) }}
 ') %}
-  {{ avatar_group([
-    {"src": "https://github.com/shadcn.png", "alt": "shadcn", "fallback": "CN"},
-    {"src": "https://github.com/maxleiter.png", "alt": "maxleiter", "fallback": "ML"},
-    {"src": "https://github.com/evilrabbit.png", "alt": "evilrabbit", "fallback": "ER"}
-  ], max=3, count=5) }}
+  {{ avatar_group(names=["Samuel Gendreau", "Marco Henry", "Ken Dresdell", "Jean Martin Morin", "Marie Tremblay"], max=3) }}
 {% endcall %}
 
 {# ── Progress ── #}
@@ -211,6 +216,32 @@
   <div class="grid gap-2 w-full max-w-sm">
     <label class="label" for="eg-email">Email</label>
     <input class="input" type="email" id="eg-email" placeholder="you@company.com" />
+  </div>
+{% endcall %}
+
+{# ── Image Picker ── #}
+{% call section("Image Picker", "Search for a provided image or upload a validated file. The open controls stack into a full-width layout on mobile.", '
+{% from "kdui/components/image_picker.html" import image_picker %}
+{{ image_picker(
+  id="cover-photo",
+  label="Cover Photo",
+  upload_name="cover_photo",
+  selected_name="selected_image",
+  max_size_mb=5
+) }}
+
+{# Connect search with initKduiImagePicker({onSearch}) or kdui:image-search. #}
+') %}
+  <div class="grid w-full gap-6 p-2 md:grid-cols-2">
+    <div>
+      {{ image_picker(id="gallery-cover-photo", label="Interactive Example", upload_name="cover_photo", selected_name="selected_image") }}
+      <p class="mt-2 text-xs text-muted-foreground">Try Search, Upload, keyboard navigation, and removal.</p>
+    </div>
+    <div>
+      {{ image_picker(id="gallery-selected-photo", label="Selected State", upload_name="selected_cover_photo",
+         image_src=url_for('static', filename='gallery/image-picker-demo.svg'), image_alt="Mountain lake") }}
+      <p class="mt-2 text-xs text-muted-foreground">Click the preview to change the image.</p>
+    </div>
   </div>
 {% endcall %}
 
@@ -350,7 +381,7 @@
 {# ── Data Table + Filter Tabs ── #}
 {% call section("Data Table", "Searchable, filterable table toolbar with separate desktop and mobile row views, plus a matching empty state.", '
 {% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
-{% from "kdui/components/pagination.html" import pagination %}
+{% from "kdui/components/pagination.html" import pagination, pagination_mobile %}
 
 <form method="get" action="/records" class="contents">
   {{ preserve_filters(current_filters) }}
@@ -364,13 +395,19 @@
              {"label": "All", "url": "?status=all"}
            ],
            search_value=q,
-           search_placeholder="Search records…"
+           search_placeholder="Search records…",
+           total=11
       ) }}
     </header>
     {% if rows %}
-      <div class="kdui-data-table__desktop">{{ table_desktop(id="records-table", rows=rows, columns=columns) }}</div>
-      <div class="kdui-data-table__mobile">{{ table_mobile(id="records-list", rows=rows) }}</div>
-      {{ pagination(page=page, total_pages=total_pages, base_url="/records", extra_params=current_filters) }}
+      <div class="kdui-data-table__desktop">
+        {{ table_desktop(id="records-table", rows=rows, columns=columns) }}
+        {{ pagination(page=page, total_pages=total_pages, base_url="/records", extra_params=current_filters) }}
+      </div>
+      <div class="kdui-data-table__mobile">
+        {{ table_mobile(id="records-list", rows=rows) }}
+        {{ pagination_mobile(page=page, pages=total_pages, per_page=10, total=total, items_count=rows|length, base_path="/records", filters=current_filters) }}
+      </div>
     {% else %}
       {{ table_empty_state(icon="search", title="No records found", description="Try adjusting your search or filters.") }}
     {% endif %}
@@ -378,10 +415,10 @@
 </form>
 ') %}
   {% set demo_columns = [
-    {"label": "Date", "class_": "w-28"},
-    {"label": "Type", "class_": "w-24"},
-    {"label": "Contact", "class_": "w-36"},
-    {"label": "Topic", "class_": "w-auto"}
+    {"label": "Date", "class": "w-28"},
+    {"label": "Type", "class": "w-24"},
+    {"label": "Contact", "class": "w-36"},
+    {"label": "Topic", "class": "w-auto"}
   ] %}
   {% set demo_rows = [
     {
@@ -459,17 +496,19 @@
                {"label": "All", "url": "#", "count": 11}
              ],
              search_value=demo_q,
-             search_placeholder="Search records…"
+             search_placeholder="Search records…",
+             total=11
         ) }}
       </header>
       <div class="kdui-data-table__desktop">
-        {{ table_desktop(id="gallery-records-table", rows=demo_rows_filtered, columns=demo_columns, item_name="Customer") }}
+        {{ table_desktop(id="gallery-records-table", rows=demo_rows_filtered, columns=demo_columns) }}
+        {{ pagination(page=1, total_pages=5, base_url="#") }}
       </div>
       <div class="kdui-data-table__mobile">
         {{ table_mobile(id="gallery-records-list", rows=demo_rows_filtered) }}
+        {{ pagination_mobile(page=1, pages=5, per_page=3, total=11, items_count=3, base_path="#") }}
       </div>
     </div>
-    {{ pagination(page=1, total_pages=5, base_url="#") }}
   </div>
   <div class="w-full max-w-sm">
     <div class="text-sm text-muted-foreground mb-2">Mobile-only card list, same component</div>
@@ -483,11 +522,13 @@
                {"label": "All", "url": "#", "count": 11}
              ],
              search_value="",
-             search_placeholder="Search records…"
+             search_placeholder="Search records…",
+             total=11
         ) }}
       </header>
       <div class="kdui-data-table__mobile">
         {{ table_mobile(id="gallery-mobile-only-list", rows=demo_rows_filtered) }}
+        {{ pagination_mobile(page=1, pages=5, per_page=3, total=11, items_count=3, base_path="#") }}
       </div>
     </div>
   </div>
@@ -542,6 +583,53 @@
       {"date": "Aug 8, 2026", "title": "Prototype created", "badge": "Draft", "badge_variant": "outline"}
     ]) }}
   </div>
+{% endcall %}
+
+{# ── Activity Heatmap ── #}
+{% call section("Activity Heatmap", "Current-year activity calendar with GitHub’s contribution colors and selectable inline details.", '
+{% from "kdui/components/activity_heatmap.html" import activity_heatmap %}
+{{ activity_heatmap(
+  days=[
+    {
+      "date": "2026-09-11",
+      "count": 4,
+      "activities": [
+        {"time": "09:14", "title": "Contact created", "type": "Contact"},
+        {"time": "10:32", "title": "Follow-up email sent", "type": "Email"}
+      ]
+    }
+  ],
+  selected_date="2026-09-11",
+  label="activities"
+) }}
+', preview_class='w-full') %}
+  {% set heatmap_days = [
+    {"date": "2026-01-08", "count": 2},
+    {"date": "2026-01-09", "count": 5},
+    {"date": "2026-01-21", "count": 9},
+    {"date": "2026-02-03", "count": 3},
+    {"date": "2026-02-12", "count": 12},
+    {"date": "2026-02-19", "count": 7},
+    {"date": "2026-03-04", "count": 4},
+    {"date": "2026-03-18", "count": 14},
+    {"date": "2026-04-07", "count": 6},
+    {"date": "2026-05-15", "count": 10},
+    {"date": "2026-06-09", "count": 3},
+    {"date": "2026-07-23", "count": 8},
+    {"date": "2026-08-06", "count": 5},
+    {"date": "2026-08-27", "count": 11},
+    {
+      "date": "2026-09-11",
+      "count": 4,
+      "activities": [
+        {"time": "09:14", "title": "Contact created", "description": "Added Morgan Lee to the workspace.", "type": "Contact"},
+        {"time": "10:32", "title": "Follow-up email sent", "description": "Sent the requested pricing information.", "type": "Email"},
+        {"time": "13:05", "title": "Discovery call completed", "type": "Call"},
+        {"time": "15:40", "title": "Proposal created", "type": "Proposal"}
+      ]
+    }
+  ] %}
+  {{ activity_heatmap(days=heatmap_days, selected_date="2026-09-11", label="activities") }}
 {% endcall %}
 
 {# ── Metric Pill ── #}
