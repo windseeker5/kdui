@@ -29,7 +29,9 @@
                   (right-aligned), since this is almost always the last
                   column in a table and should never overflow past the
                   right edge of the viewport.
-    icon_only     {bool}   Use a compact three-dot trigger. Default false.
+    icon_only     {bool}   Use a compact three-dot trigger. Default false. The label then
+                  becomes the button's accessible name ("Actions" if left as "Action"),
+                  so pass a specific one such as "Actions for Studio Lumen".
 #}
 {% from "kdui/basecoat/dropdown-menu.html.jinja" import dropdown_menu %}
 
@@ -58,7 +60,7 @@
 {% call dropdown_menu(
   id=id,
   trigger=icon_trigger if icon_only else text_trigger,
-  trigger_attrs={"class": "btn", "data-variant": "outline", "data-size": ("icon-sm" if icon_only else "sm"), "aria-label": ("Actions" if icon_only else label)},
+  trigger_attrs={"class": "btn", "data-variant": "outline", "data-size": ("icon-sm" if icon_only else "sm"), "aria-label": (("Actions" if label == "Action" else label) if icon_only else label)},
   popover_attrs={"data-align": align}
 ) %}
   {{ _action_items(items, id) }}

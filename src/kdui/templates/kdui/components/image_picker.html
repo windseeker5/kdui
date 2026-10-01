@@ -25,6 +25,23 @@
         }
       });
     </script>
+
+  Crop, resize and photo search (the MiniPass logo picker's behaviour):
+    {% from "kdui/components/image_picker.html" import image_picker, image_picker_dialogs %}
+    {{ image_picker(id="cover-photo", ...) }}
+    {{ image_picker_dialogs(id="cover-photo") }}   {# the crop and search-results dialogs #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => initKduiImageCrop({
+        id: "cover-photo", aspectRatio: 1, maxWidth: 512, maxHeight: 512,
+        searchUrl: "/photos/search", downloadUrl: "/photos/download", imageBaseUrl: "/photos/"
+      }));
+    </script>
+  A chosen file opens the crop dialog; the crop is resized and compressed in the browser and
+  replaces the file in the form. The search calls searchUrl (JSON list of {thumb, full, alt?})
+  and downloadUrl ({success, filename}); the picked filename becomes the value of the picker's
+  hidden `selected_name` field. See static/kdui/js/components/image_picker_crop.js.
 #}
 
 {% from "kdui/components/button.html" import button %}
@@ -94,4 +111,34 @@
   <p class="kdui-image-picker__status" id="{{ id }}-status" aria-live="polite"></p>
   {% if selected_name %}<input type="hidden" name="{{ selected_name }}" id="{{ id }}-selected" value="{{ selected_value }}">{% endif %}
 </div>
+{% endmacro %}
+
+{# The dialogs initKduiImageCrop() opens: "Adjust photo" (crop) and "Select an image" (search results). #}
+{% macro image_picker_dialogs(id, crop_title="Adjust photo", crop_hint="Drag to reposition. Scroll to zoom.", crop_confirm_label="Use photo", results_title="Select an image") %}
+<dialog id="{{ id }}-crop" class="alert-dialog kdui-image-dialog" aria-labelledby="{{ id }}-crop-title">
+  <div>
+    <header>
+      <h2 id="{{ id }}-crop-title">{{ crop_title }}</h2>
+      <p>{{ crop_hint }}</p>
+    </header>
+    <section>
+      <div class="kdui-image-crop__stage"><img id="{{ id }}-crop-image" alt="Photo to crop"></div>
+    </section>
+    <footer>
+      <button type="button" class="btn" data-variant="outline" id="{{ id }}-crop-cancel">Cancel</button>
+      <button type="button" class="btn" id="{{ id }}-crop-confirm">{{ crop_confirm_label }}</button>
+    </footer>
+  </div>
+</dialog>
+<dialog id="{{ id }}-results" class="alert-dialog kdui-image-dialog" aria-labelledby="{{ id }}-results-title">
+  <div>
+    <header><h2 id="{{ id }}-results-title">{{ results_title }}</h2></header>
+    <section><div class="kdui-image-results" id="{{ id }}-results-grid" aria-live="polite"></div></section>
+    <footer>
+      <button type="button" class="btn" data-variant="outline" id="{{ id }}-results-prev" disabled>Previous</button>
+      <button type="button" class="btn" data-variant="outline" id="{{ id }}-results-next" disabled>Next</button>
+      <button type="button" class="btn" data-variant="outline" onclick="this.closest('dialog').close()">Close</button>
+    </footer>
+  </div>
+</dialog>
 {% endmacro %}

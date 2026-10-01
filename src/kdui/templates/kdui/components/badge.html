@@ -1,4 +1,6 @@
-{# Basecoat Badge primitive. #}
+{# Basecoat Badge primitive.
+   variant: default | secondary | destructive | outline, a logo colour: orange | pink | plum | violet | blue,
+   or green (a curated exception for a friendly/positive status; not one of the logo's own bar colours). #}
 {% macro badge(label=None, variant=None, href=None, class_='', attrs={}) %}
 {% set tag = 'a' if href else 'span' %}
 <{{ tag }} class="badge {{ class_ }}"{% if href %} href="{{ href }}"{% endif %}{% if variant %} data-variant="{{ variant }}"{% endif %}{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>{{ (caller() if caller is defined else label) | safe }}</{{ tag }}>

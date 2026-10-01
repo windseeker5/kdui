@@ -39,6 +39,9 @@
     - chart_type (str): "area" | "bar".
     - period (str): selected period code. Default "7d".
     - periods (list): available period codes; None/[] omits dropdown.
+    - caption (str): small muted text after the trend badge, e.g. "vs last week".
+      For when there is no period dropdown but the card still needs to say what
+      the number and change are relative to. None (default) omits it.
     - size (str): "default" | "compact".
     - attrs (dict): extra attributes on the outer element.
 
@@ -111,7 +114,7 @@
 </svg>
 {% endmacro %}
 
-{% macro kpi_card_desktop(id, label, value, format="number", change=None, trend_data=None, chart_type="area", period="7d", periods=["7d", "30d", "90d", "all"], size="default", attrs={}) %}
+{% macro kpi_card_desktop(id, label, value, format="number", change=None, trend_data=None, chart_type="area", period="7d", periods=["7d", "30d", "90d", "all"], caption=None, size="default", attrs={}) %}
 <div id="{{ id }}" class="kdui-kpi-card"
   {% if size != "default" %}data-size="{{ size }}"{% endif %}
   data-kpi-format="{{ format }}"
@@ -142,7 +145,10 @@
       {% set formatted = "{:,.0f}".format(value) if (value | int == value) else "{:,.1f}".format(value) %}
       {% if format == "currency" %}${% endif %}{{ formatted }}
     </div>
-    {{ _kpi_trend(change) }}
+    <div class="kdui-kpi-card__trend-row">
+      {{ _kpi_trend(change) }}
+      {% if caption %}<span class="kdui-kpi-card__caption">{{ caption }}</span>{% endif %}
+    </div>
   </div>
   {% if trend_data %}
     <div class="kdui-kpi-card__chart" id="{{ id }}-chart">

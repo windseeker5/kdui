@@ -8,7 +8,7 @@
         "date": "2026-09-11",
         "count": 3,
         "activities": [
-          {"time": "09:14", "title": "Contact created", "type": "Contact"},
+          {"time": "09:14", "title": "Record created", "type": "Record"},
           {"time": "10:32", "title": "Follow-up email sent", "type": "Email"}
         ]
       }
@@ -20,6 +20,7 @@
     selected_date {string} Initially selected ISO date. Optional.
     label         {string} Noun used in the summary and accessible labels.
     empty_message {string} Message shown when a selected date has no records.
+    show_legend   {bool}   Show the Less to More intensity legend. Default true.
     class_        {string} Extra classes on the root element.
     attrs         {dict}   Additional attributes on the root element.
 
@@ -27,7 +28,7 @@
   The kdui_activity_year filter creates the current-year calendar and computes
   levels when they are not supplied. Future dates are displayed but disabled.
 #}
-{% macro activity_heatmap(days=[], selected_date=None, label='activities', empty_message='No activities recorded for this date.', class_='', attrs={}) %}
+{% macro activity_heatmap(days=[], selected_date=None, label='activities', empty_message='No activities recorded for this date.', show_legend=True, class_='', attrs={}) %}
 {% set calendar = days | kdui_activity_year %}
 {% set id = 'activity-heatmap-' ~ (range(100000, 999999) | random | string) %}
 <div
@@ -82,11 +83,13 @@
 
       <div class="kdui-activity-heatmap__footer">
         <span>Select a date to view activity</span>
+        {% if show_legend %}
         <div class="kdui-activity-heatmap__legend" aria-label="Activity intensity from less to more">
           <span>Less</span>
           {% for level in range(5) %}<i data-level="{{ level }}"></i>{% endfor %}
           <span>More</span>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>

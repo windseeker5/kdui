@@ -7,11 +7,12 @@
 {% from "kdui/components/data_table.html" import table_toolbar, table_desktop, table_mobile, table_empty_state, preserve_filters %}
 {% from "kdui/components/pagination.html" import pagination, pagination_mobile %}
 {% from "kdui/components/kpi_card.html" import kpi_card_desktop, kpi_card_mobile %}
+{% from "kdui/components/kanban.html" import kanban, kanban_column, kanban_dock, kanban_card, kanban_row %}
 {% from "kdui/components/file_upload.html" import file_upload %}
 {% from "kdui/components/timeline.html" import timeline %}
 {% from "kdui/components/activity_heatmap.html" import activity_heatmap %}
 {% from "kdui/components/avatar.html" import avatar_initials, avatar_group, avatar_photo %}
-{% from "kdui/components/image_picker.html" import image_picker %}
+{% from "kdui/components/image_picker.html" import image_picker, image_picker_dialogs %}
 {% from "kdui/components/progress.html" import progress %}
 {% from "kdui/components/skeleton.html" import skeleton %}
 {% from "kdui/components/breadcrumb.html" import breadcrumb %}
@@ -245,6 +246,30 @@
   </div>
 {% endcall %}
 
+{# ── Image Picker: crop and resize ── #}
+{% call section("Image Picker — crop and resize", "A chosen file opens a crop dialog; the crop is resized and compressed in the browser, then replaces the file in the form. Search results open in a second dialog when searchUrl is set. Ported from the MiniPass logo picker; needs Cropper.js.", '
+{% from "kdui/components/image_picker.html" import image_picker, image_picker_dialogs %}
+{{ image_picker(id="logo", label="Logo", upload_name="logo", selected_name="keep_logo", selected_value="1", mode="upload") }}
+{{ image_picker_dialogs(id="logo") }}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => initKduiImageCrop({
+    id: "logo", aspectRatio: 1, maxWidth: 512, maxHeight: 512,
+    searchUrl: "/photos/search", downloadUrl: "/photos/download", imageBaseUrl: "/photos/"
+  }));
+</script>
+') %}
+  <div class="w-full p-2">
+    {{ image_picker(id="gallery-crop-photo", label="Square crop, 512 px", upload_name="crop_photo", mode="upload", upload_hint="PNG, JPEG, or WebP. You crop it before it is used.") }}
+    {{ image_picker_dialogs(id="gallery-crop-photo") }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    <script>document.addEventListener("DOMContentLoaded", () => initKduiImageCrop({ id: "gallery-crop-photo", aspectRatio: 1, maxWidth: 512, maxHeight: 512 }));</script>
+  </div>
+{% endcall %}
+
 {# ── Field ── #}
 {% call section("Field", "Accessible Basecoat field and fieldset structure for any form control.", '
 {% from "kdui/components/field.html" import field %}
@@ -366,6 +391,54 @@
     {{ kpi_card_mobile(id="gallery-kpi-revenue-m", label="Revenue", value=1248, format="currency", change=12.4) }}
     {{ kpi_card_mobile(id="gallery-kpi-unpaid-m", label="Unpaid", value=3, period_label="Last 30 days") }}
   </div>
+{% endcall %}
+
+{# ── Kanban ── #}
+{% set kb_move = [
+  {"label": "Open card", "url": "#", "icon": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>'},
+  {"type": "separator"},
+  {"label": "Move to In progress", "icon": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'},
+  {"label": "Move to Done", "icon": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'}
+] %}
+{% call section("Kanban", "Columns of cards with a dock for end states. Wide: all columns side by side. Narrow: a tab strip, one column at a time. Every card has a menu, so moving never needs a mouse; dragging is a shortcut.", '
+{% from "kdui/components/kanban.html" import kanban, kanban_column, kanban_dock, kanban_card, kanban_row %}
+{% call kanban(id="deals", move_url="/deals/{id}/move", csrf_token=csrf_token(), cols=2, dock=true,
+               tabs=[{"id": "new", "label": "New", "count": 2, "color": "var(--chart-1)"},
+                     {"id": "doing", "label": "In progress", "count": 1, "color": "var(--chart-2)"},
+                     {"id": "done", "label": "Done", "count": 1, "color": "var(--chart-3)"}],
+               active="new") %}
+  {% call kanban_column(id="new", label="New", count=2, total="$600", color="var(--chart-1)") %}
+    {{ kanban_card(id=1, title="Studio Lumen", href="#", subtitle="Marie Tremblay",
+                   note="Send first message · due today", tone="warning",
+                   value="$300", aside="Close Oct 10", actions=menu_items) }}
+  {% endcall %}
+  {% call kanban_dock() %}
+    {% call kanban_column(id="done", label="Done", count=1, total="$300", compact=true) %}
+      {{ kanban_row(id=3, title="Club de Judo", href="#", value="$300", actions=menu_items) }}
+    {% endcall %}
+  {% endcall %}
+{% endcall %}
+', preview_class='block') %}
+  {% call kanban(id="gallery-kanban", cols=2, dock=true, label="Example board",
+                 tabs=[{"id": "new", "label": "New", "count": 2, "color": "var(--chart-1)"},
+                       {"id": "doing", "label": "In progress", "count": 1, "color": "var(--chart-2)"},
+                       {"id": "done", "label": "Done", "count": 1, "color": "var(--chart-3)"}],
+                 active="new") %}
+    {% call kanban_column(id="new", label="New", count=2, total="$600", color="var(--chart-1)") %}
+      {{ kanban_card(id=101, title="Studio Lumen", href="#", subtitle="Marie Tremblay · 1d in stage", note="Send first message · due today", tone="warning", value="$300", aside="Close Oct 10", actions=kb_move, draggable=false) }}
+      {{ kanban_card(id=102, title="Club Nautique du Lac", href="#", subtitle="Étienne Roy · 3d in stage", note="Follow-up · overdue 2 days", tone="danger", value="$300", aside="No close date", actions=kb_move, draggable=false) }}
+    {% endcall %}
+    {% call kanban_column(id="doing", label="In progress", count=1, total="$300", color="var(--chart-2)") %}
+      {% call kanban_card(id=103, title="Karaté Rive-Sud", href="#", subtitle="Marc Ouellet · 2d in stage", note="Follow-up · due Sep 23", value="$300", aside="Close Oct 8", actions=kb_move, draggable=false) %}
+        <button type="button" class="btn" data-variant="outline" data-size="sm">Extra action</button>
+      {% endcall %}
+    {% endcall %}
+    {% call kanban_dock() %}
+      {% call kanban_column(id="done", label="Done", count=1, total="$300", color="var(--chart-3)", compact=true) %}
+        {{ kanban_row(id=104, title="Club de Judo Kodokan", href="#", value="$300", actions=kb_move, draggable=false) }}
+      {% endcall %}
+    {% endcall %}
+  {% endcall %}
 {% endcall %}
 
 {# ── Alert ── #}

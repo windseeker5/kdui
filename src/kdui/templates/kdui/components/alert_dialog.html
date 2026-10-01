@@ -23,16 +23,17 @@
     attrs           {dict}    Additional attributes for the dialog element.
 #}
 
-{% macro alert_dialog(trigger='Show dialog', title='Are you sure?', description=None, cancel_label='Cancel', confirm_label='Continue', confirm_variant=None, size=None, class_='', attrs={}) %}
-{% set id = 'alert-dialog-' ~ (range(100000, 999999) | random | string) %}
-<button
+{% macro alert_dialog(trigger='Show dialog', title='Are you sure?', description=None, cancel_label='Cancel', confirm_label='Continue', confirm_variant=None, confirm_type='button', trigger_variant='outline', trigger_size=None, size=None, class_='', attrs={}, id=None) %}
+{% set id = id or ('alert-dialog-' ~ (range(100000, 999999) | random | string)) %}
+{% if trigger %}<button
   type="button"
   class="btn"
-  data-variant="outline"
+  data-variant="{{ trigger_variant }}"
+  {% if trigger_size %}data-size="{{ trigger_size }}"{% endif %}
   onclick="document.getElementById('{{ id }}').showModal()"
 >
   {{ trigger }}
-</button>
+</button>{% endif %}
 <dialog
   id="{{ id }}"
   class="alert-dialog {{ class_ }}"
@@ -52,7 +53,7 @@
     {% endif %}
     <footer>
       <button type="button" class="btn" data-variant="outline" onclick="this.closest('dialog').close()">{{ cancel_label }}</button>
-      <button type="button" class="btn" {% if confirm_variant %}data-variant="{{ confirm_variant }}"{% endif %} onclick="this.closest('dialog').close()">{{ confirm_label }}</button>
+      <button type="{{ confirm_type }}" class="btn" {% if confirm_variant %}data-variant="{{ confirm_variant }}"{% endif %}{% if confirm_type == 'button' %} onclick="this.closest('dialog').close()"{% endif %}>{{ confirm_label }}</button>
     </footer>
   </div>
 </dialog>

@@ -22,7 +22,8 @@
       action=url_for('gallery.patterns'),
       method="get",
       cancel_url=url_for('gallery.patterns'),
-      submit_label="Create project"
+      submit_label="Create project",
+      secondary_submit={"label": "Save and add a task", "formaction": url_for('gallery.patterns')}
     ) %}
       {% call field(id="project-name", label="Project name *", description="Use a short, recognizable name.") %}
         <input class="input" id="project-name" name="name" placeholder="Website redesign" required>

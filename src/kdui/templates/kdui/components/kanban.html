@@ -1,0 +1,113 @@
+{#
+  Kanban board: stage columns of cards that can be dragged from one column to
+  another, plus a narrow "dock" for end states (for example Done / Archived).
+
+  Layout is decided by the board's own width, not the screen's:
+    - wide:   every column side by side, dock on the right, no sideways scroll.
+    - narrow: a strip of tabs with counts, one column shown at a time.
+    - no JavaScript: columns simply stack, one under the other.
+
+  Moving a card is always possible without a mouse: give every card a menu
+  (`actions`) with "Move to" items. Dragging is a shortcut on top of that.
+
+  Usage:
+    {% from "kdui/components/kanban.html" import kanban, kanban_column, kanban_dock, kanban_card, kanban_row %}
+    {% call kanban(id="board", move_url="/items/{id}/move", csrf_token=csrf_token(), cols=4, dock=true,
+                   tabs=[{"id": "new", "label": "New", "count": 2, "color": "var(--chart-1)"}, ...],
+                   active="new") %}
+      {% call kanban_column(id="new", label="New", count=2, total="$600", color="var(--chart-1)") %}
+        {{ kanban_card(id=1, title="Website redesign", href="/items/1", subtitle="Alex Martin",
+                       note="Review draft · due today", tone="warning",
+                       value="$300", aside="Close Oct 10", actions=[...]) }}
+      {% endcall %}
+      {% call kanban_dock() %}
+        {% call kanban_column(id="done", label="Done", count=1, total="$300", compact=true) %}
+          {{ kanban_row(id=8, title="Logo refresh", href="/items/8", value="$300", actions=[...]) }}
+        {% endcall %}
+      {% endcall %}
+    {% endcall %}
+
+  kanban params:
+    id          {string} Unique id.
+    move_url    {string} Optional. URL that receives a POST when a card is dropped in another
+                column; "{id}" is replaced by the card id. The POST carries csrf_token, stage
+                (the column id) and position (end of the column). The page reloads afterwards,
+                so totals and anything the server changes along the way stay correct.
+                Leave empty to turn dragging off.
+    csrf_token  {string} Sent with the move POST.
+    cols        {int}    Columns outside the dock. Default 4.
+    dock        {bool}   True when a kanban_dock() follows the columns.
+    tabs        {list}   Narrow layout: [{id, label, short, count, color}], one per column, in order.
+                (short is an optional shorter label for the tab.)
+    active      {string} Column id shown first in the narrow layout.
+    label       {string} Accessible name of the board.
+
+  kanban_column params:
+    id, label, count {int}, total {string, optional}, color {string, optional CSS colour},
+    empty {string} text shown when count is 0, compact {bool} for dock columns.
+    The body (the cards) comes from the call block and is only rendered when count > 0.
+
+  kanban_card params:
+    id, title, href, subtitle, note (the next step), tone ("danger" | "warning" | "muted"),
+    value, aside, actions (action_menu items, needs at least one), draggable {bool}.
+    An optional call block adds extra content (for example buttons) under the note.
+
+  kanban_row params (compact card for the dock): id, title, href, value, actions, draggable.
+#}
+{% from "kdui/components/action_menu.html" import action_menu %}
+
+{% macro kanban(id, tabs=None, move_url="", csrf_token="", cols=4, dock=false, active="", label="Board") %}
+<div class="kdui-kanban" id="{{ id }}" data-kanban data-move-url="{{ move_url }}" data-csrf="{{ csrf_token }}" data-active="{{ active }}" style="--kdui-kanban-cols: {{ cols }}">
+  {% if tabs %}
+  <div class="kdui-kanban__tabs" role="tablist" aria-label="{{ label }} stages">
+    {% for tab in tabs %}
+    <button type="button" class="kdui-kanban__tab" role="tab" data-kanban-tab="{{ tab.id }}" aria-selected="false"{% if tab.color %} style="--kdui-kanban-color: {{ tab.color }}"{% endif %}>
+      {% if tab.color %}<span class="kdui-kanban__dot" aria-hidden="true"></span>{% endif %}{{ tab.short or tab.label }}<span class="kdui-kanban__count">{{ tab.count }}</span>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="kdui-kanban__board"{% if dock %} data-dock{% endif %} role="group" aria-label="{{ label }}">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro kanban_column(id, label, count=0, total=None, color=None, empty="Drop a card here", compact=false) %}
+<section class="kdui-kanban__col{% if compact %} kdui-kanban__col--compact{% endif %}" data-kanban-col="{{ id }}"{% if color %} style="--kdui-kanban-color: {{ color }}"{% endif %}>
+  <header class="kdui-kanban__head">
+    <div class="kdui-kanban__head-row"><h2>{{ label }}</h2><span class="kdui-kanban__count">{{ count }}</span></div>
+    {% if total %}<p class="kdui-kanban__total">{{ total }}</p>{% endif %}
+  </header>
+  <div class="kdui-kanban__lane" data-kanban-lane aria-label="{{ label }}">
+    {% if count and caller %}{{ caller() }}{% else %}<p class="kdui-kanban__empty">{{ empty }}</p>{% endif %}
+  </div>
+</section>
+{% endmacro %}
+
+{% macro kanban_dock() %}
+<div class="kdui-kanban__dock">{{ caller() }}</div>
+{% endmacro %}
+
+{% macro kanban_card(id, title, href, subtitle=None, note=None, tone="muted", value=None, aside=None, actions=None, draggable=true) %}
+<article class="kdui-kanban-card" data-kanban-card data-id="{{ id }}"{% if draggable %} draggable="true"{% endif %}>
+  <div class="kdui-kanban-card__top">
+    <a class="kdui-kanban-card__title" href="{{ href }}" draggable="false">{{ title }}</a>
+    {% if actions %}{{ action_menu(id="kanban-card-" ~ id, items=actions, icon_only=true, label="Actions for " ~ title) }}{% endif %}
+  </div>
+  {% if subtitle %}<p class="kdui-kanban-card__meta">{{ subtitle }}</p>{% endif %}
+  {% if note %}<p class="kdui-kanban-card__note" data-tone="{{ tone }}">{{ note }}</p>{% endif %}
+  {% if caller %}<div class="kdui-kanban-card__extra">{{ caller() }}</div>{% endif %}
+  {% if value or aside %}
+  <footer class="kdui-kanban-card__foot"><span class="kdui-kanban-card__value">{{ value or "" }}</span>{% if aside %}<span>{{ aside }}</span>{% endif %}</footer>
+  {% endif %}
+</article>
+{% endmacro %}
+
+{% macro kanban_row(id, title, href, value=None, actions=None, draggable=true) %}
+<div class="kdui-kanban-row" data-kanban-card data-id="{{ id }}"{% if draggable %} draggable="true"{% endif %}>
+  <a class="kdui-kanban-row__title" href="{{ href }}" draggable="false">{{ title }}</a>
+  {% if value %}<span class="kdui-kanban-card__value">{{ value }}</span>{% endif %}
+  {% if actions %}{{ action_menu(id="kanban-card-" ~ id, items=actions, icon_only=true, label="Actions for " ~ title) }}{% endif %}
+</div>
+{% endmacro %}

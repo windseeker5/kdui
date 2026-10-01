@@ -1,6 +1,6 @@
 {
-  "name": "flask-shadcn-starter",
-  "version": "0.2.0",
+  "name": "kd-ui",
+  "version": "0.3.0",
   "private": true,
   "description": "Build packaged Tailwind CSS and Basecoat assets for KD UI.",
   "scripts": {

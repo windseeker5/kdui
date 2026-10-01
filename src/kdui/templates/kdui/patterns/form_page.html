@@ -1,6 +1,11 @@
 {#
   Reusable create/edit form composition.
 
+  Optional: enctype="multipart/form-data" when the form uploads files.
+
+  Optional: secondary_submit={"label": ..., "formaction": ...} adds a second, outline submit button
+  before the primary one — the same form's fields post to a different URL (e.g. "Save and add a lead").
+
   Usage:
     {% from "kdui/patterns/form_page.html" import form_page %}
     {% call form_page(
@@ -14,7 +19,7 @@
       <!-- fields -->
     {% endcall %}
 #}
-{% macro form_page(title, card_title, action, cancel_url, submit_label="Save changes", description=None, card_description=None, method="post", form_id="resource-form", errors=[], class_="max-w-2xl", attrs={}) %}
+{% macro form_page(title, card_title, action, cancel_url, submit_label="Save changes", description=None, card_description=None, method="post", form_id="resource-form", enctype=None, errors=[], class_="max-w-2xl", attrs={}, secondary_submit=None) %}
 <div class="{{ class_ }}"{% for key, value in (attrs or {}).items() %}{% if value is sameas true %} {{ key }}{% elif value is not sameas false and value is not none %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
   <div class="mb-6">
     <h1 class="text-2xl font-semibold tracking-tight">{{ title }}</h1>
@@ -33,16 +38,17 @@
     </div>
   {% endif %}
 
-  <form id="{{ form_id }}" method="{{ method }}" action="{{ action }}" class="card">
+  <form id="{{ form_id }}" method="{{ method }}" action="{{ action }}"{% if enctype %} enctype="{{ enctype }}"{% endif %} class="card kdui-form-card">
     <header>
       <h2>{{ card_title }}</h2>
       {% if card_description %}<p>{{ card_description }}</p>{% endif %}
     </header>
-    <section class="grid gap-5">
+    <section class="kdui-form-fields grid gap-5">
       {{ caller() }}
     </section>
     <footer class="justify-end gap-2">
       <a href="{{ cancel_url }}" class="btn" data-variant="ghost">Cancel</a>
+      {% if secondary_submit %}<button type="submit" class="btn" data-variant="outline"{% if secondary_submit.formaction %} formaction="{{ secondary_submit.formaction }}"{% endif %}>{{ secondary_submit.label }}</button>{% endif %}
       <button type="submit" class="btn">{{ submit_label }}</button>
     </footer>
   </form>

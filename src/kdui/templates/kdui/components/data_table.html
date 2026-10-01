@@ -6,8 +6,18 @@
   search field remains visible in wide cards and replaces the tabs in narrow
   cards when the search button is pressed.
 
+  A photo (avatar_url) is laid over the initials, so when the photo cannot load
+  (for example a Gravatar that does not exist) it removes itself and the initials stay.
+
+  avatar_shape: "square" shows the avatar as a rounded square (a project or organisation
+  picture) instead of a circle. It works with or without avatar_url.
+
+  The avatar is optional: a row without avatar_name (for example a project, a
+  task, a template) shows no avatar and its text starts at the left edge.
+  Name the first column with table_desktop(first_column="Project"); it defaults to "User".
+
   Row shape:
-    {id, avatar_name, avatar_url?, primary, secondary?, mobile_secondary?,
+    {id, avatar_name?, avatar_url?, avatar_shape?, primary, secondary?, mobile_secondary?,
      cells: [safe HTML], badges?, mobile_badges?, actions: [...]}
 
   Usage:
@@ -33,7 +43,7 @@
     </button>
     <input type="search" id="{{ id }}-input" class="kdui-table-toolbar__search-input"
            name="{{ search_name }}" value="{{ search_value }}"
-           placeholder="{{ search_placeholder }}" autocomplete="off">
+           placeholder="{{ search_placeholder }}" autocomplete="off" aria-label="{{ search_placeholder|replace('…', '') }}">
   </div>
   {{ filter_tabs(tabs) }}
   {% if total is not none %}
@@ -52,12 +62,17 @@
 {% for badge in badges %}<span class="kdui-table-badge kdui-table-badge--{{ badge.variant | default('secondary') }}">{{ badge.text }}</span>{% endfor %}
 {% endmacro %}
 
-{% macro table_desktop(id, columns, rows, action_icon_only=true) %}
+{% macro _row_avatar(row) %}
+{% set square = row.avatar_shape == "square" %}
+{% if row.avatar_url %}<span class="kdui-table-avatar{% if square %} kdui-table-avatar--square{% endif %}">{{ avatar_initials(row.avatar_name) }}{{ avatar_photo(row.avatar_url, alt="", attrs={"loading": "lazy", "referrerpolicy": "no-referrer", "onerror": "this.remove()"}) }}</span>{% elif row.avatar_name and square %}<span class="kdui-table-avatar kdui-table-avatar--square">{{ avatar_initials(row.avatar_name) }}</span>{% elif row.avatar_name %}{{ avatar_initials(row.avatar_name) }}{% endif %}
+{% endmacro %}
+
+{% macro table_desktop(id, columns, rows, action_icon_only=true, first_column="User") %}
 <div class="table-container">
   <table class="table" id="{{ id }}">
     <thead>
       <tr>
-        <th>User</th>
+        <th>{{ first_column }}</th>
         {% for col in columns %}<th class="{{ col.class | default('') }}">{{ col.label }}</th>{% endfor %}
         <th class="text-center">Actions</th>
       </tr>
@@ -67,7 +82,7 @@
       <tr>
         <td class="align-middle">
           <div class="kdui-table-user">
-            {% if row.avatar_url %}{{ avatar_photo(row.avatar_url, alt=row.primary) }}{% else %}{{ avatar_initials(row.avatar_name) }}{% endif %}
+            {{ _row_avatar(row) }}
             <div class="kdui-table-user__text">
               <div class="kdui-table-user__primary">{{ row.primary }}</div>
               {% if row.secondary %}<div class="kdui-table-user__secondary">{{ row.secondary }}</div>{% endif %}
@@ -94,7 +109,7 @@
   {% set mobile_secondary = row.mobile_secondary if row.mobile_secondary is defined else row.secondary %}
   {% set mobile_badges = row.mobile_badges if row.mobile_badges is defined else row.badges %}
   <div class="kdui-table-mobile-card">
-    {% if row.avatar_url %}{{ avatar_photo(row.avatar_url, alt=row.primary) }}{% else %}{{ avatar_initials(row.avatar_name) }}{% endif %}
+    {{ _row_avatar(row) }}
     <div class="kdui-table-mobile-card__body">
       <div class="kdui-table-mobile-card__primary">{{ row.primary }}</div>
       {% if mobile_secondary %}<div class="kdui-table-mobile-card__secondary">{{ mobile_secondary }}</div>{% endif %}

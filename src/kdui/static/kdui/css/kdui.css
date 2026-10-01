@@ -1,8 +1,14 @@
 /* KD UI accessibility defaults for touch input. */
 @media (pointer: coarse) {
   .input,
+  .combobox input[role="combobox"],
   .btn:not([data-size^="icon"]) {
     min-height: 44px;
+  }
+
+  /* 16px keeps iOS from zooming the page when a field gets focus. */
+  .combobox input[role="combobox"] {
+    font-size: 1rem;
   }
 
   [data-touch-target] {
@@ -291,6 +297,9 @@
    -------------------------------------------------------------------------- */
 .kdui-data-table {
   container-type: inline-size;
+  /* .card clips its children. A row's action menu hangs below the last row, so it
+     must be allowed out of the card; the last row rounds its own corners instead. */
+  overflow: visible;
 }
 
 .kdui-data-table .table thead th {
@@ -316,6 +325,14 @@
   border-bottom: 1px solid var(--border);
 }
 
+.kdui-data-table__desktop .table tbody tr:last-child > td:first-child {
+  border-bottom-left-radius: var(--radius-xl);
+}
+
+.kdui-data-table__desktop .table tbody tr:last-child > td:last-child {
+  border-bottom-right-radius: var(--radius-xl);
+}
+
 .kdui-data-table__desktop,
 .kdui-data-table__mobile {
   padding: 0;
@@ -323,6 +340,13 @@
 
 .kdui-data-table__desktop {
   display: block;
+}
+
+/* The desktop table only shows in wide cards, so it never needs to scroll.
+   Basecoat's overflow-x:auto also makes overflow-y scroll, which clips a row's
+   action menu (and adds a scrollbar) when the table has only a few rows. */
+.kdui-data-table__desktop .table-container {
+  overflow: visible;
 }
 
 .kdui-data-table__mobile {
@@ -500,6 +524,17 @@
   color: var(--kdui-kpi-flat);
 }
 
+.kdui-kpi-card__trend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.kdui-kpi-card__caption {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
 .kdui-kpi-card__period-trigger {
   display: inline-flex;
   align-items: center;
@@ -647,6 +682,10 @@
 .kdui-avatar-group__more { background: var(--muted); color: var(--muted-foreground); }
 
 /* Data Table row content and MiniPass color badges. */
+.kdui-table-avatar { position: relative; display: inline-flex; flex-shrink: 0; }
+.kdui-table-avatar > .kdui-avatar-photo { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* A project or organisation picture: a rounded square, not a circle. */
+.kdui-table-avatar--square, .kdui-table-avatar--square > .kdui-avatar-initials, .kdui-table-avatar--square > .kdui-avatar-photo { border-radius: var(--radius-md); }
 .kdui-table-user { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
 .kdui-table-user__text { min-width: 0; }
 .kdui-table-user__primary { font-weight: 600; }
@@ -748,3 +787,298 @@ a.kdui-pagination-mobile__button:hover { background: var(--accent); color: var(-
 .kdui-pagination-mobile__label { color: var(--foreground); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
 .kdui-pagination-mobile__label strong { color: var(--primary); font-weight: 600; }
 .kdui-pagination-mobile__empty { color: var(--muted-foreground); font-size: 0.875rem; }
+
+/* --------------------------------------------------------------------------
+   Form page — the one grid column may shrink below its content. Without this,
+   a long line in a textarea (which grows with its content) or a wide input
+   makes the column, and every field in it, wider than the card on a phone.
+   -------------------------------------------------------------------------- */
+.kdui-form-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* --------------------------------------------------------------------------
+   Accordion — an open panel must not clip what pops out of it. Basecoat hides
+   overflow on the panel, which cut off a select's dropdown list placed inside.
+   -------------------------------------------------------------------------- */
+.accordion > details[open] > :not(summary) {
+  overflow: visible;
+}
+
+/* --------------------------------------------------------------------------
+   Form page card — Basecoat cards clip their content (overflow: hidden), which
+   cut off any select or combobox list that opens near the bottom of the card.
+   -------------------------------------------------------------------------- */
+.kdui-form-card {
+  overflow: visible;
+}
+
+/* ==========================================================================
+   Kanban — stage columns of cards, an optional dock for end states, and a tab
+   strip when the board itself is narrow (container query, not screen width).
+   ========================================================================== */
+.kdui-kanban {
+  container-type: inline-size;
+  /* A size container has no intrinsic width, so fill the parent even inside flex. */
+  inline-size: 100%;
+  --kdui-kanban-warning: oklch(0.5 0.12 65);
+}
+.dark .kdui-kanban { --kdui-kanban-warning: oklch(0.82 0.14 80); }
+
+.kdui-kanban__board {
+  display: grid;
+  grid-template-columns: repeat(var(--kdui-kanban-cols, 4), minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+.kdui-kanban__board[data-dock] {
+  grid-template-columns: repeat(var(--kdui-kanban-cols, 4), minmax(0, 1fr)) minmax(12rem, 0.85fr);
+}
+.kdui-kanban__col { min-width: 0; }
+.kdui-kanban__dock { display: grid; gap: 0.75rem; min-width: 0; }
+
+.kdui-kanban__head {
+  border-top: 3px solid var(--kdui-kanban-color, var(--border));
+  padding: 0.5rem 0.125rem 0.625rem;
+}
+.kdui-kanban__head-row { display: flex; align-items: center; gap: 0.5rem; }
+.kdui-kanban__head h2 {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.kdui-kanban__total {
+  margin: 0.125rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.kdui-kanban__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.375rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.kdui-kanban__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: none;
+  border-radius: 50%;
+  background: var(--kdui-kanban-color, var(--muted-foreground));
+}
+
+.kdui-kanban__lane {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  min-height: 7.5rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--muted) 60%, transparent);
+}
+.kdui-kanban__col--compact .kdui-kanban__lane { min-height: 4.5rem; }
+.kdui-kanban__lane[data-over] { outline: 2px solid var(--ring); outline-offset: -2px; }
+.kdui-kanban__empty {
+  margin: 0;
+  padding: 0.875rem 0.5rem;
+  border: 1px dashed color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+  border-radius: var(--radius-lg);
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.kdui-kanban-card {
+  display: grid;
+  gap: 0.3125rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--card-foreground, var(--foreground));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+.kdui-kanban-card[draggable="true"], .kdui-kanban-row[draggable="true"] { cursor: grab; }
+.kdui-kanban-card:hover { border-color: color-mix(in oklab, var(--foreground) 28%, var(--border)); }
+[data-dragging] { opacity: 0.35; }
+.kdui-kanban-card__top { display: flex; align-items: flex-start; gap: 0.25rem; }
+.kdui-kanban-card__title {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.125rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.kdui-kanban-card__title:hover, .kdui-kanban-row__title:hover { text-decoration: underline; text-underline-offset: 2px; }
+/* The card menu is a quiet three-dot button, not a bordered one on every card. */
+.kdui-kanban-card__top .dropdown-menu > button,
+.kdui-kanban-row .dropdown-menu > button {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted-foreground);
+}
+.kdui-kanban-card__top .dropdown-menu > button { margin: -0.25rem -0.375rem 0 0; }
+.kdui-kanban-card__top .dropdown-menu > button:hover,
+.kdui-kanban-row .dropdown-menu > button:hover,
+.kdui-kanban .dropdown-menu > button[aria-expanded="true"] { background: var(--muted); color: var(--foreground); }
+.kdui-kanban-card__meta { margin: 0; color: var(--muted-foreground); font-size: 0.8125rem; line-height: 1.3; }
+.kdui-kanban-card__note {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+.kdui-kanban-card__note::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+.kdui-kanban-card__note[data-tone="danger"] { color: var(--destructive); font-weight: 600; }
+.kdui-kanban-card__note[data-tone="warning"] { color: var(--kdui-kanban-warning); font-weight: 600; }
+.kdui-kanban-card__extra { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.kdui-kanban-card__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.125rem;
+  padding-top: 0.4375rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.kdui-kanban-card__value { color: var(--foreground); font-size: 0.875rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+.kdui-kanban-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font-size: 0.8125rem;
+}
+.kdui-kanban-row__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Tabs only exist in the narrow layout, and only once the script is running. */
+.kdui-kanban__tabs { display: none; }
+.kdui-kanban__tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  height: 2.75rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+.kdui-kanban__tab[aria-selected="true"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
+.kdui-kanban__tab[aria-selected="true"] .kdui-kanban__count {
+  background: color-mix(in oklab, var(--primary-foreground) 22%, transparent);
+  color: var(--primary-foreground);
+}
+.kdui-kanban__tab:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+@container (max-width: 62rem) {
+  .kdui-kanban__board, .kdui-kanban__board[data-dock], .kdui-kanban__dock { display: block; }
+  .kdui-kanban__col + .kdui-kanban__col, .kdui-kanban__dock { margin-top: 1.5rem; }
+  .kdui-kanban[data-enhanced] .kdui-kanban__tabs {
+    display: flex;
+    gap: 0.375rem;
+    margin: 0 0 0.75rem;
+    padding: 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .kdui-kanban[data-enhanced] .kdui-kanban__tabs::-webkit-scrollbar { display: none; }
+  .kdui-kanban[data-enhanced] .kdui-kanban__col:not([data-active]) { display: none; }
+  .kdui-kanban[data-enhanced] .kdui-kanban__col + .kdui-kanban__col,
+  .kdui-kanban[data-enhanced] .kdui-kanban__dock { margin-top: 0; }
+  .kdui-kanban__lane { min-height: 6rem; }
+}
+@media (pointer: coarse) {
+  .kdui-kanban-card__top .dropdown-menu > button { min-width: 2.75rem; min-height: 2.75rem; margin: -0.625rem -0.75rem -0.5rem 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Badge colours — the five bar colours of the minipass logo, as soft pills,
+   plus "green" — a curated exception for a friendly/positive status (the logo
+   itself has no green): <span class="badge" data-variant="orange|pink|plum|violet|blue|green">.
+   -------------------------------------------------------------------------- */
+.badge[data-variant="orange"] { --kdui-pill: #f3840f; }
+.badge[data-variant="pink"] { --kdui-pill: #e31a5a; }
+.badge[data-variant="plum"] { --kdui-pill: #9f1574; }
+.badge[data-variant="violet"] { --kdui-pill: #5a2692; }
+.badge[data-variant="blue"] { --kdui-pill: #143495; }
+.badge[data-variant="green"] { --kdui-pill: #00704a; }
+.badge[data-variant="orange"],
+.badge[data-variant="pink"],
+.badge[data-variant="plum"],
+.badge[data-variant="violet"],
+.badge[data-variant="blue"],
+.badge[data-variant="green"] {
+  border-color: transparent;
+  background: color-mix(in oklab, var(--kdui-pill) 14%, var(--background));
+  color: color-mix(in oklab, var(--kdui-pill) 78%, black);
+}
+.dark .badge[data-variant="orange"],
+.dark .badge[data-variant="pink"],
+.dark .badge[data-variant="plum"],
+.dark .badge[data-variant="violet"],
+.dark .badge[data-variant="blue"],
+.dark .badge[data-variant="green"] {
+  background: color-mix(in oklab, var(--kdui-pill) 28%, var(--background));
+  color: color-mix(in oklab, var(--kdui-pill) 50%, white);
+}
+
+/* Image Picker crop and search-results dialogs (image_picker_dialogs). */
+.kdui-image-dialog > div { width: min(40rem, calc(100vw - 2rem)); max-width: none; }
+.kdui-image-crop__stage { display: flex; max-height: 60vh; overflow: hidden; align-items: center; justify-content: center; border-radius: var(--radius-md); background: var(--muted); }
+.kdui-image-crop__stage img { display: block; max-width: 100%; max-height: 60vh; }
+.kdui-image-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.75rem; max-height: 60vh; overflow-y: auto; }
+.kdui-image-results__item { padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--muted); cursor: pointer; aspect-ratio: 4 / 3; }
+.kdui-image-results__item:hover, .kdui-image-results__item:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.kdui-image-results__item[aria-busy="true"] { opacity: 0.5; cursor: wait; }
+.kdui-image-results__item img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.kdui-image-results__message { grid-column: 1 / -1; margin: 0; padding: 1.5rem 0; color: var(--muted-foreground); text-align: center; font-size: 0.875rem; }
